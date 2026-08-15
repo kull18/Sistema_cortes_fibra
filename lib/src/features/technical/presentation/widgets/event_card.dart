@@ -20,6 +20,8 @@ class EventCard extends StatelessWidget {
         return AppColors.statusRed;
       case FiberEventStatus.atendido:
         return AppColors.statusGreen;
+      case FiberEventStatus.cerrado:
+        return AppColors.textSecondary;
       case FiberEventStatus.pendiente:
         return AppColors.statusAmber;
     }
@@ -46,7 +48,6 @@ class EventCard extends StatelessWidget {
               Text(
                 event.id,
                 style: const TextStyle(
-                  fontFamily: 'JetBrainsMono',
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryBlue,

@@ -24,31 +24,37 @@ class _HomeScreenState extends State<HomeScreen> {
     FiberEvent(
       id: 'EV-2025-041',
       title: 'Corte Total de Fibra Monomodo',
+      description: 'Se reporta pérdida total de señal en tramo principal.',
       originPrefix: 'TGZ',
       destinationPrefix: 'SCH',
       kmReference: 'Km 14.2',
       location: 'Tuxtla Gutiérrez - Berriozábal',
       timeLabel: 'Hace 25 min',
+      reporterName: 'Carlos Mendoza',
       status: FiberEventStatus.activo,
     ),
     FiberEvent(
       id: 'EV-2025-039',
       title: 'Atenuación Severa en Empalme',
+      description: 'Niveles de potencia por debajo del estándar en OLT.',
       originPrefix: 'SCH',
       destinationPrefix: 'SCL',
       kmReference: 'Km 22.1',
       location: 'San Cristóbal de las Casas',
       timeLabel: 'Hace 1 hora',
+      reporterName: 'Ana Laura Gómez',
       status: FiberEventStatus.activo,
     ),
     FiberEvent(
       id: 'EV-2025-035',
       title: 'Fusiones y Reparación de Anillo',
+      description: 'Trabajos de mantenimiento preventivo en infraestructura.',
       originPrefix: 'TGZ',
       destinationPrefix: 'SCL',
       kmReference: 'Km 41.8',
       location: 'Socoltenango',
       timeLabel: 'Hoy, 10:15 AM',
+      reporterName: 'Roberto Solís',
       status: FiberEventStatus.atendido,
     ),
   ];
@@ -56,12 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onTabSelected(AppTab tab) {
     switch (tab) {
       case AppTab.inicio:
-        break; // ya estamos aquí
+        break;
       case AppTab.reportar:
         Navigator.of(context).pushNamed('/reportar-evento');
         break;
       case AppTab.eventos:
-        // Navigator.of(context).pushNamed('/eventos');
+        Navigator.of(context).pushReplacementNamed('/eventos');
         break;
       case AppTab.perfil:
         // Navigator.of(context).pushNamed('/perfil');
@@ -98,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // TODO: navegar a Directorio de Centrales
             },
             onHistorial: () {
-              // TODO: navegar a Historial de eventos
+              Navigator.of(context).pushNamed('/eventos');
             },
           ),
           const SizedBox(height: 24),
@@ -109,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() => _selectedFilter = filter);
             },
             onVerTodos: () {
-              // TODO: navegar a la screen de Eventos
+              Navigator.of(context).pushNamed('/eventos');
             },
             onEventTap: (event) {
               // TODO: navegar al Detalle del Evento

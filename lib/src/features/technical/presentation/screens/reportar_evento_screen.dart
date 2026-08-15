@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/models/central.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -94,7 +95,9 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
     setState(() => _isSubmitting = false);
-    Navigator.of(context).pop();
+    
+    // Navegar a la pantalla de confirmación
+    Navigator.of(context).pushReplacementNamed(AppRoutes.confirmacionRegistro);
   }
 
   @override
@@ -103,7 +106,7 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
       currentTab: AppTab.reportar,
       onTabSelected: (tab) {
         if (tab == AppTab.inicio) {
-          Navigator.of(context).pushReplacementNamed('/home');
+          Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         }
       },
       appBar: DetailTopBar(
