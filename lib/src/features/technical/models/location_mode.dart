@@ -1,0 +1,1 @@
+enum LocationMode { gps, manual }
