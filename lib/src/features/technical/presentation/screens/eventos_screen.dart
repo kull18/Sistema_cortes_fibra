@@ -73,8 +73,25 @@ class _EventosScreenState extends State<EventosScreen> {
   ];
 
   void _onTabSelected(AppTab tab) {
-    if (tab == AppTab.inicio) Navigator.of(context).pushReplacementNamed('/home');
-    if (tab == AppTab.reportar) Navigator.of(context).pushNamed('/reportar-evento');
+    if (tab == AppTab.eventos) return;
+
+    switch (tab) {
+      case AppTab.inicio:
+        Navigator.of(context).pushReplacementNamed('/home');
+        break;
+      case AppTab.centrales:
+        Navigator.of(context).pushReplacementNamed('/centrales');
+        break;
+      case AppTab.reportar:
+        Navigator.of(context).pushNamed('/reportar-evento');
+        break;
+      case AppTab.eventos:
+        Navigator.of(context).pushNamed('/eventos');
+        break;
+      case AppTab.perfil:
+        Navigator.of(context).pushReplacementNamed('/perfil');
+        break;
+    }
   }
 
   @override
@@ -86,8 +103,12 @@ class _EventosScreenState extends State<EventosScreen> {
         appTitle: 'Eventos',
         subtitle: 'Registro de eventos',
         notificationCount: 3,
-        onNotificationTap: () {},
-        onAvatarTap: () {},
+        onNotificationTap: () {
+          Navigator.of(context).pushNamed('/notifications');
+        },
+        onAvatarTap: () {
+          Navigator.of(context).pushReplacementNamed('/perfil');
+        },
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -145,7 +166,9 @@ class _EventosScreenState extends State<EventosScreen> {
           // Lista de Eventos usando DetailedEventCard
           ..._events.map((event) => DetailedEventCard(
             event: event,
-            onVerDetalle: () {},
+            onVerDetalle: () {
+              Navigator.of(context).pushNamed('/event-detail', arguments: event);
+            },
           )),
           
           const SizedBox(height: 8),

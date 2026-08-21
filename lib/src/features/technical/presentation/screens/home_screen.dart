@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -60,17 +61,22 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   void _onTabSelected(AppTab tab) {
+    if (tab == AppTab.inicio) return;
+
     switch (tab) {
       case AppTab.inicio:
         break;
+      case AppTab.centrales:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
+        break;
       case AppTab.reportar:
-        Navigator.of(context).pushNamed('/reportar-evento');
+        Navigator.of(context).pushNamed(AppRoutes.reportarEvento);
         break;
       case AppTab.eventos:
-        Navigator.of(context).pushReplacementNamed('/eventos');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
         break;
       case AppTab.perfil:
-        // Navigator.of(context).pushNamed('/perfil');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         break;
     }
   }
@@ -83,10 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppTopBar(
         notificationCount: 3,
         onNotificationTap: () {
-          // TODO: navegar a notificaciones
+          Navigator.of(context).pushNamed(AppRoutes.notifications);
         },
         onAvatarTap: () {
-          // TODO: navegar a Perfil
+          Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         },
       ),
       body: Column(
@@ -101,10 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
               // TODO: navegar a Mapa General
             },
             onCentrales: () {
-              // TODO: navegar a Directorio de Centrales
+              Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
             },
             onHistorial: () {
-              Navigator.of(context).pushNamed('/eventos');
+              Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
+            },
+            onMisPublicaciones: () {
+              Navigator.of(context).pushNamed(AppRoutes.misEventos);
             },
           ),
           const SizedBox(height: 24),
@@ -115,10 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() => _selectedFilter = filter);
             },
             onVerTodos: () {
-              Navigator.of(context).pushNamed('/eventos');
+              Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
             },
             onEventTap: (event) {
-              // TODO: navegar al Detalle del Evento
+              Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
             },
           ),
         ],
