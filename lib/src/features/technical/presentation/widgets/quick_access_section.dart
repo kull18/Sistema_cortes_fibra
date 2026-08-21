@@ -6,12 +6,14 @@ class QuickAccessSection extends StatelessWidget {
   final VoidCallback onMapaGeneral;
   final VoidCallback onCentrales;
   final VoidCallback onHistorial;
+  final VoidCallback onMisPublicaciones;
 
   const QuickAccessSection({
     super.key,
     required this.onMapaGeneral,
     required this.onCentrales,
     required this.onHistorial,
+    required this.onMisPublicaciones,
   });
 
   @override
@@ -33,7 +35,7 @@ class QuickAccessSection extends StatelessWidget {
           children: [
             Expanded(
               child: QuickAccessButton(
-                iconPath: 'assets/icons/mapa.svg',
+                iconPath: 'assets/icons/ic_map.svg',
                 label: 'Mapa General',
                 onTap: onMapaGeneral,
               ),
@@ -41,17 +43,29 @@ class QuickAccessSection extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: QuickAccessButton(
-                iconPath: 'assets/icons/brujula.svg',
+                iconPath: 'assets/icons/ic_compass.svg',
                 label: 'Centrales',
                 onTap: onCentrales,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: QuickAccessButton(
+                iconPath: 'assets/icons/ic_file.svg',
+                label: 'Historial',
+                onTap: onHistorial,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: QuickAccessButton(
-                iconPath: 'assets/icons/archivo.svg',
-                label: 'Historial',
-                onTap: onHistorial,
+                iconPath: 'assets/icons/ic_user.svg', // Usamos el de usuario para "Mis..."
+                label: 'Mis Reportes',
+                onTap: onMisPublicaciones,
               ),
             ),
           ],

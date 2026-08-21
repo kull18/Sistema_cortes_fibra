@@ -9,6 +9,7 @@ import 'user_avatar.dart';
 /// Contiene: logo + nombre de app, badge de conectividad, notificaciones y avatar.
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String appTitle;
+  final String? subtitle;
   final bool isOnline;
   final int notificationCount;
   final String? avatarUrl;
@@ -18,6 +19,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   const AppTopBar({
     super.key,
     this.appTitle = 'FiberTech Ops',
+    this.subtitle,
     this.isOnline = true,
     this.notificationCount = 0,
     this.avatarUrl,
@@ -30,8 +32,6 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Usamos SafeArea aquí para asegurar que el contenido no choque con el notch
-    // independientemente de cómo se use este widget.
     return SafeArea(
       bottom: false,
       child: Container(
@@ -60,13 +60,27 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                appTitle,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    appTitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                ],
               ),
             ),
             ConnectivityBadge(isOnline: isOnline),

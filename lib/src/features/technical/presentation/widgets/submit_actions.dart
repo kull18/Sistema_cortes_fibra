@@ -66,7 +66,7 @@ class SubmitActions extends StatelessWidget {
                         ],
                       ),
                       SvgPicture.asset(
-                        'assets/icons/flecha.svg',
+                        'assets/icons/ic_arrow_right.svg',
                         width: 16,
                         height: 16,
                         colorFilter: const ColorFilter.mode(
