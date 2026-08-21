@@ -22,7 +22,7 @@ class MapGeneralCard extends StatelessWidget {
           Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/mapa.svg',
+                'assets/icons/ic_map.svg',
                 width: 18,
                 colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
               ),
@@ -81,7 +81,7 @@ class MapGeneralCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgPicture.asset(
-                  'assets/icons/mapa.svg',
+                  'assets/icons/ic_map.svg',
                   width: 18,
                   colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
                 ),

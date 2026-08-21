@@ -45,16 +45,16 @@ class ConfirmationSummarySection extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 8),
           child: Divider(color: AppColors.borderSubtle, height: 1),
         ),
-        _buildSummaryItem('assets/icons/alarma.svg', 'Tramo Principal:', tramo),
-        _buildSummaryItem('assets/icons/ubicacion.svg', 'Ubicación en Campo:', ubicacion),
+        _buildSummaryItem('assets/icons/ic_alarm.svg', 'Tramo Principal:', tramo),
+        _buildSummaryItem('assets/icons/ic_location.svg', 'Ubicación en Campo:', ubicacion),
         _buildSummaryItem(
           'assets/icons/ic_sparkles.svg',
           'Tipo de Incidente:',
           tipoIncidente,
           isBadge: true,
         ),
-        _buildSummaryItem('assets/icons/persona.svg', 'Reportado Por:', reportadoPor),
-        _buildSummaryItem('assets/icons/reloj.svg', 'Hora de Registro:', horaRegistro),
+        _buildSummaryItem('assets/icons/ic_user.svg', 'Reportado Por:', reportadoPor),
+        _buildSummaryItem('assets/icons/ic_clock.svg', 'Hora de Registro:', horaRegistro),
       ],
     );
   }

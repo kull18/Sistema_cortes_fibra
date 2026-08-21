@@ -41,7 +41,7 @@ class EventIdentifierCard extends StatelessWidget {
             child: Row(
               children: [
                 SvgPicture.asset(
-                  'assets/icons/archivo.svg',
+                  'assets/icons/ic_file.svg',
                   width: 18,
                   colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
                 ),

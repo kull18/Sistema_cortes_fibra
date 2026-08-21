@@ -14,7 +14,7 @@ class DiagnosisSection extends StatelessWidget {
       stepNumber: 3,
       title: 'Diagnóstico Técnico del Evento',
       subtitle: 'Atributos y descripción del hallazgo',
-      iconAssetPath: 'assets/icons/alarma.svg',
+      iconAssetPath: 'assets/icons/ic_alarm.svg',
       iconColor: AppColors.statusRed,
       iconBackgroundColor: AppColors.statusRed.withOpacity(0.12),
       child: Column(
@@ -57,7 +57,7 @@ class DiagnosisSection extends StatelessWidget {
                 Row(
                   children: [
                     SvgPicture.asset(
-                      'assets/icons/alarma.svg',
+                      'assets/icons/ic_alarm.svg',
                       width: 16,
                       height: 16,
                       colorFilter: const ColorFilter.mode(

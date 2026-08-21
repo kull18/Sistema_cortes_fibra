@@ -45,7 +45,7 @@ class EventsSection extends StatelessWidget {
             Row(
               children: [
                 SvgPicture.asset(
-                  'assets/icons/alarma.svg',
+                  'assets/icons/ic_alarm.svg',
                   width: 14,
                   height: 14,
                   colorFilter: const ColorFilter.mode(
@@ -80,7 +80,7 @@ class EventsSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   SvgPicture.asset(
-                    'assets/icons/flecha.svg',
+                    'assets/icons/ic_arrow_right.svg',
                     width: 14,
                     height: 14,
                     colorFilter: const ColorFilter.mode(

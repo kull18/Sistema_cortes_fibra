@@ -30,7 +30,7 @@ class ConfirmationActions extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                'assets/icons/signos_vitales.svg',
+                'assets/icons/ic_vital_signs.svg',
                 width: 20,
                 colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
@@ -45,7 +45,7 @@ class ConfirmationActions extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: onVolverInicio,
           icon: SvgPicture.asset(
-            'assets/icons/casa.svg',
+            'assets/icons/ic_home.svg',
             width: 20,
             colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
           ),
@@ -61,7 +61,7 @@ class ConfirmationActions extends StatelessWidget {
         TextButton.icon(
           onPressed: onReportarOtro,
           icon: SvgPicture.asset(
-            'assets/icons/mas.svg',
+            'assets/icons/ic_plus.svg',
             width: 20,
             colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
           ),

@@ -45,7 +45,7 @@ class ConfirmationSuccessHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SvgPicture.asset(
-                'assets/icons/escudo.svg',
+                'assets/icons/ic_shield.svg',
                 width: 14,
                 colorFilter: const ColorFilter.mode(AppColors.statusGreen, BlendMode.srcIn),
               ),

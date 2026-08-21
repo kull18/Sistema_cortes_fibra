@@ -97,7 +97,7 @@ class DetailedEventCard extends StatelessWidget {
             child: Row(
               children: [
                 SvgPicture.asset(
-                  'assets/icons/ubicacion.svg',
+                  'assets/icons/ic_location.svg',
                   width: 14,
                   colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
                 ),
@@ -129,7 +129,7 @@ class DetailedEventCard extends StatelessWidget {
               Row(
                 children: [
                   SvgPicture.asset(
-                    'assets/icons/persona.svg',
+                    'assets/icons/ic_user.svg',
                     width: 14,
                     colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
                   ),

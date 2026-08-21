@@ -44,7 +44,7 @@ class IncidenciasSummaryCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: SvgPicture.asset(
-                    'assets/icons/signos_vitales.svg',
+                    'assets/icons/ic_vital_signs.svg',
                     width: 22,
                     colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
                   ),

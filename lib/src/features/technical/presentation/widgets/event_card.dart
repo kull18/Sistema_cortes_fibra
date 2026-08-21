@@ -70,7 +70,7 @@ class EventCard extends StatelessWidget {
           Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/brujula.svg',
+                'assets/icons/ic_compass.svg',
                 width: 14,
                 height: 14,
                 colorFilter: const ColorFilter.mode(
@@ -111,7 +111,7 @@ class EventCard extends StatelessWidget {
                 Row(
                   children: [
                     SvgPicture.asset(
-                      'assets/icons/ubicacion.svg',
+                      'assets/icons/ic_location.svg',
                       width: 14,
                       height: 14,
                       colorFilter: const ColorFilter.mode(
@@ -137,7 +137,7 @@ class EventCard extends StatelessWidget {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/reloj.svg',
+                        'assets/icons/ic_clock.svg',
                         width: 12,
                         height: 12,
                         colorFilter: const ColorFilter.mode(
@@ -179,7 +179,7 @@ class EventCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     SvgPicture.asset(
-                      'assets/icons/flecha.svg',
+                      'assets/icons/ic_arrow_right.svg',
                       width: 14,
                       height: 14,
                       colorFilter: const ColorFilter.mode(

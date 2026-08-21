@@ -41,7 +41,7 @@ class LocationSection extends StatelessWidget {
       stepNumber: 2,
       title: 'Ubicación Exacta del Corte',
       subtitle: 'Coordenadas GPS y distancia a centrales',
-      iconAssetPath: 'assets/icons/brujula.svg',
+      iconAssetPath: 'assets/icons/ic_compass.svg',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
