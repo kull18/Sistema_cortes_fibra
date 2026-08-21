@@ -19,7 +19,7 @@ class ConnectivityBadge extends StatelessWidget {
       ),
       child: Center(
         child: SvgPicture.asset(
-          'assets/icons/wifi.svg',
+          'assets/icons/ic_wifi.svg',
           width: 16,
           height: 16,
           colorFilter: ColorFilter.mode(

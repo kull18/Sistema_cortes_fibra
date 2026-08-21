@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../app_colors.dart';
+enum AppTab { inicio, centrales, reportar, eventos, perfil }
 
-enum AppTab { inicio, reportar, eventos, perfil }
-
-/// Bottom navigation compartida entre Home, Reportar, Eventos y Perfil.
+/// Bottom navigation compartida entre Home, Centrales, Reportar, Eventos y Perfil.
 class AppBottomNavBar extends StatelessWidget {
   final AppTab currentTab;
   final ValueChanged<AppTab> onTabSelected;
@@ -35,25 +34,31 @@ class AppBottomNavBar extends StatelessWidget {
           child: Row(
             children: [
               _NavItem(
-                iconPath: 'assets/icons/casa.svg',
+                iconPath: 'assets/icons/ic_home.svg',
                 label: 'Inicio',
                 isSelected: currentTab == AppTab.inicio,
                 onTap: () => onTabSelected(AppTab.inicio),
               ),
               _NavItem(
-                iconPath: 'assets/icons/mas.svg',
+                iconPath: 'assets/icons/ic_layers.svg',
+                label: 'Centrales',
+                isSelected: currentTab == AppTab.centrales,
+                onTap: () => onTabSelected(AppTab.centrales),
+              ),
+              _NavItem(
+                iconPath: 'assets/icons/ic_plus.svg',
                 label: 'Reportar',
                 isSelected: currentTab == AppTab.reportar,
                 onTap: () => onTabSelected(AppTab.reportar),
               ),
               _NavItem(
-                iconPath: 'assets/icons/signos_vitales.svg',
+                iconPath: 'assets/icons/ic_vital_signs.svg',
                 label: 'Eventos',
                 isSelected: currentTab == AppTab.eventos,
                 onTap: () => onTabSelected(AppTab.eventos),
               ),
               _NavItem(
-                iconPath: 'assets/icons/persona.svg',
+                iconPath: 'assets/icons/ic_user.svg',
                 label: 'Perfil',
                 isSelected: currentTab == AppTab.perfil,
                 onTap: () => onTabSelected(AppTab.perfil),
