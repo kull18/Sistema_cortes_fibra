@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
+import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_info_card.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_setting_section.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/logout_button.dart';
@@ -18,10 +19,20 @@ class PerfilScreen extends StatefulWidget {
 }
 
 class _PerfilScreenState extends State<PerfilScreen> {
-  bool _notificaciones = true;
-  bool _sincronizacion = true;
-  bool _gpsAltaPrecision = true;
-  bool _modoOscuro = false;
+  late bool _notificaciones;
+  late bool _sincronizacion;
+  late bool _gpsAltaPrecision;
+  late bool _modoOscuro;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializar estados desde AppPreferences
+    _notificaciones = AppPreferences.notificationsEnabled;
+    _sincronizacion = AppPreferences.offlineSyncEnabled;
+    _gpsAltaPrecision = AppPreferences.highPrecisionGpsEnabled;
+    _modoOscuro = AppPreferences.darkModeEnabled;
+  }
 
   void _onTabSelected(AppTab tab) {
     if (tab == AppTab.perfil) return;
@@ -72,7 +83,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Nueva sección de Actividad
             _buildActivitySection(),
             const SizedBox(height: 24),
 
@@ -81,10 +91,23 @@ class _PerfilScreenState extends State<PerfilScreen> {
               sincronizacion: _sincronizacion,
               gpsAltaPrecision: _gpsAltaPrecision,
               modoOscuro: _modoOscuro,
-              onNotificacionesChanged: (v) => setState(() => _notificaciones = v),
-              onSincronizacionChanged: (v) => setState(() => _sincronizacion = v),
-              onGpsAltaPrecisionChanged: (v) => setState(() => _gpsAltaPrecision = v),
-              onModoOscuroChanged: (v) => setState(() => _modoOscuro = v),
+              onNotificacionesChanged: (v) async {
+                await AppPreferences.setNotificationsEnabled(v);
+                setState(() => _notificaciones = v);
+              },
+              onSincronizacionChanged: (v) async {
+                await AppPreferences.setOfflineSyncEnabled(v);
+                setState(() => _sincronizacion = v);
+              },
+              onGpsAltaPrecisionChanged: (v) async {
+                await AppPreferences.setHighPrecisionGpsEnabled(v);
+                setState(() => _gpsAltaPrecision = v);
+              },
+              onModoOscuroChanged: (v) async {
+                await AppPreferences.setDarkModeEnabled(v);
+                setState(() => _modoOscuro = v);
+                // Opcional: Notificar a la app el cambio de tema aquí
+              },
             ),
             const SizedBox(height: 24),
 
