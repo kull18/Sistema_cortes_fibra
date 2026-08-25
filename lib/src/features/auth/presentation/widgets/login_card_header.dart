@@ -59,7 +59,7 @@ class LoginCardHeader extends StatelessWidget {
             ),
             child: Center(
               child: SvgPicture.asset(
-                'assets/icons/escudo.svg',
+                'assets/icons/ic_shield.svg',
                 width: 20,
                 height: 20,
                 colorFilter: const ColorFilter.mode(

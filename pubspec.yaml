@@ -12,6 +12,16 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.10
+  shared_preferences: ^2.2.2
+  http: ^1.2.0
+  provider: ^6.1.1
+  local_auth: ^2.3.0
+  flutter_secure_storage: ^9.2.2
+  flutter_dotenv: ^5.1.0
+  image_picker: ^1.0.7
+  crypto: ^3.0.3
+  sqflite: ^2.4.1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:
@@ -22,5 +32,6 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/icons/
     - assets/images/
