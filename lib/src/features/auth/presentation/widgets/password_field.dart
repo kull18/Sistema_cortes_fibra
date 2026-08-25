@@ -61,7 +61,7 @@ class _PasswordFieldState extends State<PasswordField> {
           child: Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/candado.svg',
+                'assets/icons/ic_lock_fill.svg',
                 width: 18,
                 height: 18,
                 colorFilter: const ColorFilter.mode(
@@ -93,7 +93,7 @@ class _PasswordFieldState extends State<PasswordField> {
                   setState(() => _obscureText = !_obscureText);
                 },
                 icon: SvgPicture.asset(
-                  'assets/icons/ojo.svg',
+                  'assets/icons/ic_eye.svg',
                   width: 18,
                   height: 18,
                   colorFilter: ColorFilter.mode(
