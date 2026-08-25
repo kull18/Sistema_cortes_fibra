@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -24,47 +25,58 @@ class _HomeScreenState extends State<HomeScreen> {
     FiberEvent(
       id: 'EV-2025-041',
       title: 'Corte Total de Fibra Monomodo',
+      description: 'Se reporta pérdida total de señal en tramo principal.',
       originPrefix: 'TGZ',
       destinationPrefix: 'SCH',
       kmReference: 'Km 14.2',
       location: 'Tuxtla Gutiérrez - Berriozábal',
       timeLabel: 'Hace 25 min',
+      reporterName: 'Carlos Mendoza',
       status: FiberEventStatus.activo,
     ),
     FiberEvent(
       id: 'EV-2025-039',
       title: 'Atenuación Severa en Empalme',
+      description: 'Niveles de potencia por debajo del estándar en OLT.',
       originPrefix: 'SCH',
       destinationPrefix: 'SCL',
       kmReference: 'Km 22.1',
       location: 'San Cristóbal de las Casas',
       timeLabel: 'Hace 1 hora',
+      reporterName: 'Ana Laura Gómez',
       status: FiberEventStatus.activo,
     ),
     FiberEvent(
       id: 'EV-2025-035',
       title: 'Fusiones y Reparación de Anillo',
+      description: 'Trabajos de mantenimiento preventivo en infraestructura.',
       originPrefix: 'TGZ',
       destinationPrefix: 'SCL',
       kmReference: 'Km 41.8',
       location: 'Socoltenango',
       timeLabel: 'Hoy, 10:15 AM',
+      reporterName: 'Roberto Solís',
       status: FiberEventStatus.atendido,
     ),
   ];
 
   void _onTabSelected(AppTab tab) {
+    if (tab == AppTab.inicio) return;
+
     switch (tab) {
       case AppTab.inicio:
-        break; // ya estamos aquí
+        break;
+      case AppTab.centrales:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
+        break;
       case AppTab.reportar:
-        Navigator.of(context).pushNamed('/reportar-evento');
+        Navigator.of(context).pushNamed(AppRoutes.reportarEvento);
         break;
       case AppTab.eventos:
-        // Navigator.of(context).pushNamed('/eventos');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
         break;
       case AppTab.perfil:
-        // Navigator.of(context).pushNamed('/perfil');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         break;
     }
   }
@@ -77,10 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppTopBar(
         notificationCount: 3,
         onNotificationTap: () {
-          // TODO: navegar a notificaciones
+          Navigator.of(context).pushNamed(AppRoutes.notifications);
         },
         onAvatarTap: () {
-          // TODO: navegar a Perfil
+          Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         },
       ),
       body: Column(
@@ -95,10 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
               // TODO: navegar a Mapa General
             },
             onCentrales: () {
-              // TODO: navegar a Directorio de Centrales
+              Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
             },
             onHistorial: () {
-              // TODO: navegar a Historial de eventos
+              Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
+            },
+            onMisPublicaciones: () {
+              Navigator.of(context).pushNamed(AppRoutes.misEventos);
             },
           ),
           const SizedBox(height: 24),
@@ -109,10 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() => _selectedFilter = filter);
             },
             onVerTodos: () {
-              // TODO: navegar a la screen de Eventos
+              Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
             },
             onEventTap: (event) {
-              // TODO: navegar al Detalle del Evento
+              Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
             },
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../app_colors.dart';
+enum AppTab { inicio, centrales, reportar, eventos, perfil }
 
 enum AppTab { inicio, centrales, reportar, eventos, perfil }
 
