@@ -5,8 +5,6 @@ import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../app_colors.dart';
 enum AppTab { inicio, centrales, reportar, eventos, perfil }
 
-enum AppTab { inicio, centrales, reportar, eventos, perfil }
-
 /// Bottom navigation compartida entre Home, Centrales, Reportar, Eventos y Perfil.
 class AppBottomNavBar extends StatelessWidget {
   final AppTab currentTab;
