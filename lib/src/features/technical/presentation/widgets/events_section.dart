@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/fiber_event.dart';
+import '../../domain/entities/fiber_event.dart';
 import 'event_card.dart';
 import 'event_filter_chips.dart';
 
@@ -45,7 +45,7 @@ class EventsSection extends StatelessWidget {
             Row(
               children: [
                 SvgPicture.asset(
-                  'assets/icons/alarma.svg',
+                  'assets/icons/ic_alarm.svg',
                   width: 14,
                   height: 14,
                   colorFilter: const ColorFilter.mode(
@@ -80,7 +80,7 @@ class EventsSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   SvgPicture.asset(
-                    'assets/icons/flecha.svg',
+                    'assets/icons/ic_arrow_right.svg',
                     width: 14,
                     height: 14,
                     colorFilter: const ColorFilter.mode(

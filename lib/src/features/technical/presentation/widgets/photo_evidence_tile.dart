@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/photo_evidence.dart';
+import '../../domain/entities/photo_evidence.dart';
 
 class PhotoEvidenceTile extends StatelessWidget {
   final PhotoEvidence evidence;
