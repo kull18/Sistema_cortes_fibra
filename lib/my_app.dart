@@ -5,6 +5,7 @@ import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
 
 
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -17,7 +18,6 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'FiberTech Ops',
           themeMode: currentMode,
-          // Tema Claro
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
@@ -31,7 +31,6 @@ class MyApp extends StatelessWidget {
               elevation: 0,
             ),
           ),
-          // Tema Oscuro
           darkTheme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.dark,
@@ -40,7 +39,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.dark,
             ),
           ),
-          initialRoute: AppRoutes.home,
+          initialRoute: AppRoutes.login,
           routes: AppRoutes.routes,
         );
       },

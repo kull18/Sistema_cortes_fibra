@@ -119,6 +119,27 @@ class ApiService implements IApi {
     });
   }
 
+  @override
+  Future<Map<String, dynamic>> forgotPassword({required String technicianCode}) {
+    return _send('POST', _uri('/auth/forgot-password'), body: {
+      'technician_code': technicianCode,
+    });
+  }
+
+  @override
+  Future<Map<String, dynamic>> registerDevice({String? deviceLabel}) {
+    return _send('POST', _uri('/auth/register-device'), body: {
+      if (deviceLabel != null) 'device_label': deviceLabel,
+    });
+  }
+
+  @override
+  Future<Map<String, dynamic>> deviceLogin({required String deviceToken}) {
+    return _send('POST', _uri('/auth/device-login'), body: {
+      'device_token': deviceToken,
+    });
+  }
+
   // ---------------------------------------------------------------------
   // Users
   // ---------------------------------------------------------------------
@@ -239,6 +260,11 @@ class ApiService implements IApi {
   @override
   Future<Map<String, dynamic>> listEvents({String? status}) {
     return _send('GET', _uri('/events', status != null ? {'status': status} : null));
+  }
+
+  @override
+  Future<Map<String, dynamic>> getEvent({required int eventId}) {
+    return _send('GET', _uri('/events/$eventId'));
   }
 
   @override

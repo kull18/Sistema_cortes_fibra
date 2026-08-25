@@ -18,6 +18,9 @@ abstract class IApi {
   /// POST /auth/change-password
   Future<Map<String, dynamic>> changePassword({required String newPassword});
 
+  /// POST /auth/forgot-password
+  Future<Map<String, dynamic>> forgotPassword({required String technicianCode});
+
   // ---------------------------------------------------------------------
   // Users
   // ---------------------------------------------------------------------
@@ -90,6 +93,9 @@ abstract class IApi {
   /// GET /events?status=
   Future<Map<String, dynamic>> listEvents({String? status});
 
+  /// GET /events/{id}
+  Future<Map<String, dynamic>> getEvent({required int eventId});
+
   /// PATCH /events/{id}
   Future<Map<String, dynamic>> updateEvent({
     required int eventId,
@@ -151,4 +157,7 @@ abstract class IApi {
 
   /// POST /notifications/device-token
   Future<Map<String, dynamic>> registerDeviceToken({required String playerId});
+
+  Future<Map<String, dynamic>> registerDevice({String? deviceLabel});
+  Future<Map<String, dynamic>> deviceLogin({required String deviceToken});
 }
