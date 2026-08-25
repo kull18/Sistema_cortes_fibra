@@ -6,6 +6,7 @@ import '../../domain/usecases/create_event_usecase.dart';
 import '../../domain/usecases/get_event_photo_upload_url_usecase.dart';
 import '../../domain/usecases/create_event_photo_usecase.dart';
 import '../../domain/entities/photo_evidence.dart';
+import '../../domain/entities/fiber_event.dart';
 
 class ReportEventProvider extends ChangeNotifier {
   final CreateEventUseCase createEventUseCase;
@@ -24,7 +25,7 @@ class ReportEventProvider extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  Future<bool> reportEvent({
+  Future<FiberEvent?> reportEvent({
     required int originOfficeId,
     required int destinationOfficeId,
     required double latitude,
@@ -52,18 +53,30 @@ class ReportEventProvider extends ChangeNotifier {
         description: description,
       );
 
-      final eventId = int.parse(event.id.split('-').last); // O usar el id numérico si estuviera disponible directamente
-
-      // 2. Subir fotos
-      for (var evidence in evidences) {
-        if (evidence.localPath == null) continue;
-        await _uploadPhoto(eventId, evidence);
+      // Extraer el ID real si es un número, o usar el local_id si fue encolado
+      // El backend suele devolver un ID numérico.
+      // Si fue encolado, el caso de uso lanza una excepción EventQueuedLocallyException (según TechnicalRepositoryImpl)
+      // Pero espera, TechnicalRepositoryImpl lanza EventQueuedLocallyException si falla la red.
+      
+      int? realEventId;
+      try {
+        realEventId = int.parse(event.id);
+      } catch (_) {
+        // Es un UUID (offline)
       }
 
-      return true;
+      // 2. Subir fotos si tenemos el ID real
+      if (realEventId != null) {
+        for (var evidence in evidences) {
+          if (evidence.localPath == null) continue;
+          await _uploadPhoto(realEventId, evidence);
+        }
+      }
+
+      return event;
     } catch (e) {
       _error = e.toString();
-      return false;
+      return null;
     } finally {
       _isSubmitting = false;
       notifyListeners();

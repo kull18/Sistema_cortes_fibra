@@ -8,6 +8,7 @@ import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/preferences/user_preferences.dart';
 import '../../../technical/domain/entities/location_mode.dart';
 import '../../../technical/domain/entities/photo_evidence.dart';
 import '../widgets/reportar_hero_banner.dart';
@@ -111,7 +112,7 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
       return;
     }
 
-    final success = await context.read<ReportEventProvider>().reportEvent(
+    final event = await context.read<ReportEventProvider>().reportEvent(
       originOfficeId: int.parse(_origin!.id),
       destinationOfficeId: int.parse(_destination!.id),
       latitude: _latitude ?? 0.0,
@@ -124,8 +125,18 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
     );
 
     if (mounted) {
-      if (success) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.confirmacionRegistro);
+      if (event != null) {
+        final currentUser = await UserPreferences.getUser();
+        
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed(
+            AppRoutes.confirmacionRegistro,
+            arguments: {
+              'event': event,
+              'reportedByName': currentUser?.fullName,
+            },
+          );
+        }
       } else {
         final error = context.read<ReportEventProvider>().error;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -163,55 +174,58 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
         onNotificationTap: () {},
         onAvatarTap: () {},
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const ReportarHeroBanner(),
-          const SizedBox(height: 20),
-          if (officeProvider.isLoading && centrales.isEmpty)
-            const Center(child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: CircularProgressIndicator(),
-            ))
-          else
-            NetworkSegmentSection(
-              centrales: centrales,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const ReportarHeroBanner(),
+            const SizedBox(height: 20),
+            if (officeProvider.isLoading && centrales.isEmpty)
+              const Center(child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: CircularProgressIndicator(),
+              ))
+            else
+              NetworkSegmentSection(
+                centrales: centrales,
+                origin: _origin,
+                destination: _destination,
+                estimatedDistanceKm: _totalDistanceKm,
+                onOriginSelected: (c) => setState(() => _origin = c),
+                onDestinationSelected: (c) => setState(() => _destination = c),
+                onSwap: _handleSwap,
+              ),
+            const SizedBox(height: 16),
+            LocationSection(
+              mode: _locationMode,
+              onModeChanged: (m) => setState(() => _locationMode = m),
+              latitude: _latitude,
+              longitude: _longitude,
+              gpsPrecisionMeters: _gpsPrecision,
+              kmOnSegment: _kmOnSegment,
               origin: _origin,
               destination: _destination,
-              estimatedDistanceKm: _totalDistanceKm,
-              onOriginSelected: (c) => setState(() => _origin = c),
-              onDestinationSelected: (c) => setState(() => _destination = c),
-              onSwap: _handleSwap,
+              totalDistanceKm: _totalDistanceKm,
+              onKmChanged: (v) => setState(() => _kmOnSegment = v),
+              referenceController: _referenceController,
             ),
-          const SizedBox(height: 16),
-          LocationSection(
-            mode: _locationMode,
-            onModeChanged: (m) => setState(() => _locationMode = m),
-            latitude: _latitude,
-            longitude: _longitude,
-            gpsPrecisionMeters: _gpsPrecision,
-            kmOnSegment: _kmOnSegment,
-            origin: _origin,
-            destination: _destination,
-            totalDistanceKm: _totalDistanceKm,
-            onKmChanged: (v) => setState(() => _kmOnSegment = v),
-            referenceController: _referenceController,
-          ),
-          const SizedBox(height: 16),
-          DiagnosisSection(descriptionController: _descriptionController),
-          const SizedBox(height: 16),
-          PhotoEvidenceSection(
-            evidences: _evidences,
-            onAttach: _handleAttachPhoto,
-            onDelete: _handleDeletePhoto,
-          ),
-          const SizedBox(height: 24),
-          SubmitActions(
-            isSubmitting: reportProvider.isSubmitting,
-            onSubmit: _handleSubmit,
-            onCancel: () => Navigator.of(context).pop(),
-          ),
-        ],
+            const SizedBox(height: 16),
+            DiagnosisSection(descriptionController: _descriptionController),
+            const SizedBox(height: 16),
+            PhotoEvidenceSection(
+              evidences: _evidences,
+              onAttach: _handleAttachPhoto,
+              onDelete: _handleDeletePhoto,
+            ),
+            const SizedBox(height: 24),
+            SubmitActions(
+              isSubmitting: reportProvider.isSubmitting,
+              onSubmit: _handleSubmit,
+              onCancel: () => Navigator.of(context).pop(),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
