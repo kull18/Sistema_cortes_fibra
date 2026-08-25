@@ -1,6 +1,14 @@
+import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:sistema_cortes_fibra/src/core/api/api_exception.dart';
 import 'package:sistema_cortes_fibra/src/core/database/event_local_dao.dart';
 import 'package:sistema_cortes_fibra/src/core/database/central_office_local_dao.dart';
+import 'package:sistema_cortes_fibra/src/core/database/pending_event_dao.dart';
+import 'package:sistema_cortes_fibra/src/core/database/pending_photo_dao.dart';
+import 'package:sistema_cortes_fibra/src/core/exceptions/event_queued_locally_exception.dart';
 
 import '../../domain/entities/unread_count_entity.dart';
 import '../../domain/entities/central_office_entity.dart';
@@ -14,22 +22,24 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
   final TechnicalRemoteDataSource remoteDataSource;
   final EventLocalDao eventLocalDao;
   final CentralOfficeLocalDao centralOfficeLocalDao;
+  final PendingEventDao pendingEventDao;
+  final PendingPhotoDao pendingPhotoDao;
 
   TechnicalRepositoryImpl({
     required this.remoteDataSource,
     required this.eventLocalDao,
     required this.centralOfficeLocalDao,
+    required this.pendingEventDao,
+    required this.pendingPhotoDao,
   });
 
   @override
   Future<List<FiberEvent>> getEvents({String? status}) async {
     try {
       final models = await remoteDataSource.getEvents(status: status);
-      // Actualizar caché local (persistimos los modelos convertidos a Map)
       await eventLocalDao.replaceAll(models.map((m) => m.toJson()).toList());
       return models.map((model) => TechnicalMapper.toFiberEventEntity(model)).toList();
     } on NetworkException {
-      // Sin red: caemos al caché local
       final cached = await eventLocalDao.getCachedEvents(status: status);
       return cached.map((json) => TechnicalMapper.toFiberEventEntity(TechnicalMapper.toEventModel(json))).toList();
     }
@@ -41,7 +51,6 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
       final model = await remoteDataSource.getEvent(eventId);
       return TechnicalMapper.toFiberEventEntity(model);
     } on NetworkException {
-      // Podríamos buscar uno individual en el caché si fuera necesario
       final cached = await eventLocalDao.getCachedEvents();
       final eventJson = cached.firstWhere(
         (e) => e['id'] == eventId,
@@ -65,7 +74,6 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
   Future<List<CentralOfficeEntity>> listCentralOffices() async {
     try {
       final data = await remoteDataSource.listCentralOffices();
-      // Sincronizar centrales completas cada vez que hay red
       await centralOfficeLocalDao.replaceAll(data);
       return data.map((json) => CentralOfficeEntity.fromJson(json)).toList();
     } on NetworkException {
@@ -140,17 +148,38 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
     String? fieldReference,
     required String description,
   }) async {
-    final model = await remoteDataSource.createEvent(
-      originOfficeId: originOfficeId,
-      destinationOfficeId: destinationOfficeId,
-      latitude: latitude,
-      longitude: longitude,
-      locationMethod: locationMethod,
-      accuracy: accuracy,
-      fieldReference: fieldReference,
-      description: description,
-    );
-    return TechnicalMapper.toFiberEventEntity(model);
+    try {
+      final model = await remoteDataSource.createEvent(
+        originOfficeId: originOfficeId,
+        destinationOfficeId: destinationOfficeId,
+        latitude: latitude,
+        longitude: longitude,
+        locationMethod: locationMethod,
+        accuracy: accuracy,
+        fieldReference: fieldReference,
+        description: description,
+      );
+      return TechnicalMapper.toFiberEventEntity(model);
+    } on NetworkException {
+      final localId = const Uuid().v4();
+
+      await pendingEventDao.insert({
+        'local_id': localId,
+        'origin_office_id': originOfficeId,
+        'destination_office_id': destinationOfficeId,
+        'latitude': latitude,
+        'longitude': longitude,
+        'location_method': locationMethod,
+        'accuracy': accuracy,
+        'field_reference': fieldReference,
+        'description': description,
+        'status': 'PENDING_SYNC',
+        'created_at': DateTime.now().toIso8601String(),
+        'attempt_count': 0,
+      });
+
+      throw EventQueuedLocallyException(localId);
+    }
   }
 
   @override
@@ -195,6 +224,82 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
       label: label,
       sizeBytes: sizeBytes,
     );
+  }
+
+  @override
+  Future<void> attachPhoto({
+    required File imageFile,
+    String? realEventId,
+    String? pendingEventLocalId,
+    String? label,
+  }) async {
+    final bytes = await imageFile.readAsBytes();
+    final contentHash = sha256.convert(bytes).toString();
+    final sizeBytes = bytes.length;
+
+    final persistedPath = await _persistPhotoLocally(imageFile, contentHash);
+
+    try {
+      if (realEventId == null) {
+        throw const NetworkException('Evento aún no sincronizado');
+      }
+
+      final uploadUrlResult = await remoteDataSource.getEventPhotoUploadUrl(
+        eventId: int.parse(realEventId),
+        filename: imageFile.path.split('/').last,
+        contentHash: contentHash,
+      );
+
+      if (uploadUrlResult['already_exists'] != true) {
+        await uploadFileToS3(uploadUrlResult['upload_url'] as String, imageFile);
+      }
+
+      await remoteDataSource.createEventPhoto(
+        eventId: int.parse(realEventId),
+        objectKey: uploadUrlResult['object_key'] as String,
+        label: label,
+        sizeBytes: sizeBytes,
+      );
+    } on NetworkException {
+      await pendingPhotoDao.insert({
+        'local_id': const Uuid().v4(),
+        'pending_event_local_id': pendingEventLocalId,
+        'real_event_id': realEventId != null ? int.parse(realEventId) : null,
+        'local_file_path': persistedPath,
+        'content_hash': contentHash,
+        'label': label,
+        'size_bytes': sizeBytes,
+        'status': 'PENDING_SYNC',
+        'created_at': DateTime.now().toIso8601String(),
+        'attempt_count': 0,
+      });
+    }
+  }
+
+  Future<void> uploadFileToS3(String uploadUrl, File file) async {
+    final response = await http.put(
+      Uri.parse(uploadUrl),
+      body: await file.readAsBytes(),
+      headers: {'Content-Type': 'image/jpeg'},
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException(
+        statusCode: response.statusCode,
+        message: 'Error al subir imagen a S3',
+      );
+    }
+  }
+
+  Future<String> _persistPhotoLocally(File file, String contentHash) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final photosDir = Directory('${appDir.path}/pending_photos');
+    if (!await photosDir.exists()) await photosDir.create(recursive: true);
+
+    final extension = file.path.split('.').last;
+    final newPath = '${photosDir.path}/$contentHash.$extension';
+    await file.copy(newPath);
+    return newPath;
   }
 
   @override

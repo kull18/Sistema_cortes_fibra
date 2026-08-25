@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
               QuickAccessSection(
                 showCentrales: isAdmin,
                 onMapaGeneral: () {
-                  // TODO: navegar a Mapa General
+                  Navigator.of(context).pushNamed(AppRoutes.mapaGeneral);
                 },
                 onCentrales: () {
                   Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);

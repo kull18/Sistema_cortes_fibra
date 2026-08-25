@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../entities/unread_count_entity.dart';
 import '../entities/central_office_entity.dart';
 import '../entities/fiber_event.dart';
@@ -59,6 +60,13 @@ abstract class TechnicalRepository {
     required String objectKey,
     String? label,
     int? sizeBytes,
+  });
+
+  Future<void> attachPhoto({
+    required File imageFile,
+    String? realEventId,
+    String? pendingEventLocalId,
+    String? label,
   });
 
   Future<List<Map<String, dynamic>>> listEventPhotos(int eventId);
