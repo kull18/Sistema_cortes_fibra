@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/app_top_bar.dart';
 import '../widgets/biometric_button.dart';
 import '../widgets/login_card_header.dart';
@@ -7,50 +8,68 @@ import '../widgets/password_field.dart';
 import '../widgets/primary_login_button.dart';
 import '../widgets/remember_me_checkbox.dart';
 import '../widgets/technician_id_field.dart';
-
+import '../providers/auth_provider.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/app_routes.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+  /// Orquestador central de navegación post-autenticación.
+  /// Define el flujo: 1. Completar Perfil -> 2. Cambiar Contraseña -> 3. Home.
+  static void navigateNext(BuildContext context, AuthProvider authProvider) {
+    final user = authProvider.user;
+    if (user == null) return;
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _technicianIdController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  bool _rememberMe = true;
-  bool _isLoading = false;
-
-  @override
-  void dispose() {
-    _technicianIdController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+    if (!user.profileCompleted) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.completeProfile);
+    } else if (user.mustChangePassword) {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.changePassword);
+    } else {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    }
   }
 
-  void _handleLogin() {
-    setState(() => _isLoading = true);
+  void _handleLogin(BuildContext context, AuthProvider authProvider) async {
+    final success = await authProvider.login();
+    if (!context.mounted) return;
 
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      Navigator.of(context).pushReplacementNamed('/home');
-    });
+    if (success) {
+      navigateNext(context, authProvider);
+    } else {
+      _showError(context, authProvider.errorMessage);
+    }
   }
 
-  void _handleBiometricLogin() {
-    // TODO: integrar local_auth
+  void _handleBiometricLogin(BuildContext context, AuthProvider authProvider) async {
+    final success = await authProvider.biometricLogin();
+    if (!context.mounted) return;
+
+    if (success) {
+      navigateNext(context, authProvider);
+    } else if (authProvider.errorMessage != null) {
+      _showError(context, authProvider.errorMessage);
+    }
   }
 
-  void _handleForgotPassword() {
-    // TODO: navegar a recuperación de contraseña
+  void _showError(BuildContext context, String? message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message ?? 'Error inesperado'),
+        backgroundColor: AppColors.statusRed,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _handleForgotPassword(BuildContext context) {
+    Navigator.of(context).pushNamed(AppRoutes.forgotPassword);
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -97,28 +116,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     TechnicianIdField(
-                                      controller: _technicianIdController,
+                                      controller: authProvider.technicianCodeController,
                                     ),
                                     const SizedBox(height: 20),
                                     PasswordField(
-                                      controller: _passwordController,
-                                      onForgotPassword: _handleForgotPassword,
+                                      controller: authProvider.passwordController,
+                                      onForgotPassword: () => _handleForgotPassword(context),
                                     ),
                                     const SizedBox(height: 16),
                                     RememberMeCheckbox(
-                                      value: _rememberMe,
-                                      onChanged: (value) {
-                                        setState(() => _rememberMe = value);
-                                      },
+                                      value: authProvider.rememberMe,
+                                      onChanged: (value) => authProvider.setRememberMe(value),
                                     ),
                                     const SizedBox(height: 20),
                                     PrimaryLoginButton(
-                                      isLoading: _isLoading,
-                                      onPressed: _handleLogin,
+                                      isLoading: authProvider.isLoading,
+                                      onPressed: () => _handleLogin(context, authProvider),
                                     ),
                                     const OrDivider(label: 'o acceso alternativo'),
                                     BiometricButton(
-                                      onPressed: _handleBiometricLogin,
+                                      onPressed: () => _handleBiometricLogin(context, authProvider),
                                     ),
                                   ],
                                 ),
