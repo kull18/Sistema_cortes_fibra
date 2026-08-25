@@ -22,7 +22,7 @@ class NotificationBell extends StatelessWidget {
           children: [
             Center(
               child: SvgPicture.asset(
-                'assets/icons/campana.svg',
+                'assets/icons/ic_bell.svg',
                 width: 22,
                 height: 22,
                 colorFilter: const ColorFilter.mode(

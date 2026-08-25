@@ -16,7 +16,7 @@ class AppColors {
   static const Color borderSubtle = Color(0xFFA6A8AB);
 
   static const Color surfaceMuted = Color(0x4DE8E9EA); // ~30%
-  static const Color background = Color(0xFFF6F7F7);
+  static const Color background = Color(0xFFFFFFFF); // Cambiado a blanco
   static const Color cardHeaderBg = Color(0x33E8E9EA); // ~20% opacity
   static const Color connectivityBg = Color(0xFFDADCDE);
 

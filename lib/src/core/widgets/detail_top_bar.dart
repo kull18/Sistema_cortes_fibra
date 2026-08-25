@@ -44,7 +44,7 @@ class DetailTopBar extends StatelessWidget implements PreferredSizeWidget {
           IconButton(
             onPressed: onBack ?? () => Navigator.of(context).maybePop(),
             icon: SvgPicture.asset(
-              'assets/icons/ac_arrow_left.svg',
+              'assets/icons/ic_arrow_left.svg',
               width: 24,
               height: 24,
               colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
