@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/technical_comment.dart';
+import '../../domain/entities/technical_comment.dart';
 import 'technical_comment_tile.dart';
 
 class TechnicalCommentsSection extends StatelessWidget {

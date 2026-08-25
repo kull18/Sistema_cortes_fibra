@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
 import 'package:sistema_cortes_fibra/src/core/widgets/user_avatar.dart';
-import 'package:sistema_cortes_fibra/src/features/technical/models/technical_comment.dart';
+import '../../domain/entities/technical_comment.dart';
 
 class TechnicalCommentTile extends StatelessWidget {
   final TechnicalComment comment;

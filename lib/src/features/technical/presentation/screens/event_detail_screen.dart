@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_cortes_fibra/src/features/technical/domain/entities/fiber_event.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
-import '../../models/fiber_event.dart';
-import '../../models/technical_comment.dart';
 import '../widgets/event_detail_app_bar.dart';
 import '../widgets/event_detail_body.dart';
 import '../widgets/add_comment_bottom_bar.dart';
 import '../widgets/add_technical_note_modal.dart';
+import '../providers/event_detail_provider.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final FiberEvent event;
@@ -18,41 +19,12 @@ class EventDetailScreen extends StatefulWidget {
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
-  late List<TechnicalComment> _comments;
-
   @override
   void initState() {
     super.initState();
-    // Dummy comments for the UI
-    _comments = [
-      const TechnicalComment(
-        userName: 'Ing. Carlos Mendoza',
-        userRole: 'Técnico Líder Cuadrilla Sur',
-        userAvatar: '',
-        timeAgo: '12 min',
-        exactTime: '12:35 PM',
-        content:
-            'Llegada a sitio confirmada en Km 14.2. Se observa máquina retroexcavadora de obra vial que enganchó la tubería buffer #01. Iniciamos corte limpio e instalación de manga termocontráctil de 48 hilos.',
-      ),
-      const TechnicalComment(
-        userName: 'Roberto Solís',
-        userRole: 'Despacho NOC Tuxtla',
-        userAvatar: '',
-        timeAgo: '25 min',
-        exactTime: '11:52 AM',
-        content:
-            'Alerta notificada a clientes corporativos del segmento San Cristóbal - Tuxtla. Se habilitó ventana de mantenimiento de emergencia de 120 minutos.',
-      ),
-      const TechnicalComment(
-        userName: 'Ana Laura Gómez',
-        userRole: 'Cuadrilla Apoyo de Campo',
-        userAvatar: '',
-        timeAgo: '43 min',
-        exactTime: '11:37 AM',
-        content:
-            'Saliendo del almacén Central TGZ con la fusionadora de alineación con núcleo Fujikura 70S y 2 bobinas de hilo monomodo G.652.D.',
-      ),
-    ];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EventDetailProvider>().loadEventDetail(widget.event.id);
+    });
   }
 
   void _onTabSelected(AppTab tab) {
@@ -85,21 +57,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: AddTechnicalNoteModal(
           eventId: widget.event.id,
-          onSave: (content) {
-            setState(() {
-              _comments.insert(
-                0,
-                TechnicalComment(
-                  userName: 'Carlos Mendoza',
-                  userRole: 'Técnico en Campo',
-                  userAvatar: '',
-                  timeAgo: 'Justo ahora',
-                  exactTime: '${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}',
-                  content: content,
-                ),
+          onSave: (content) async {
+            final success = await context.read<EventDetailProvider>().addComment(content);
+            if (mounted && success) {
+              Navigator.pop(context);
+            } else if (mounted) {
+              final error = context.read<EventDetailProvider>().error;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(error ?? 'Error al agregar comentario')),
               );
-            });
-            Navigator.pop(context);
+            }
           },
         ),
       ),
@@ -108,31 +75,39 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      currentTab: AppTab.eventos,
-      onTabSelected: _onTabSelected,
-      appBar: EventDetailAppBar(
-        folio: widget.event.id,
-        onBack: () => Navigator.pop(context),
-      ),
-      body: Stack(
-        children: [
-          EventDetailBody(
-            event: widget.event,
-            comments: _comments,
+    return Consumer<EventDetailProvider>(
+      builder: (context, provider, child) {
+        final currentEvent = provider.event ?? widget.event;
+
+        return AppScaffold(
+          currentTab: AppTab.eventos,
+          onTabSelected: _onTabSelected,
+          appBar: EventDetailAppBar(
+            folio: currentEvent.id,
+            onBack: () => Navigator.pop(context),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: AddCommentBottomBar(
-              onAddComment: _showAddCommentSheet,
-            ),
-          ),
-        ],
-      ),
-      isScrollable: false,
-      padding: EdgeInsets.zero,
+          body: provider.isLoading && provider.event == null
+              ? const Center(child: CircularProgressIndicator())
+              : Stack(
+                  children: [
+                    EventDetailBody(
+                      event: currentEvent,
+                      comments: provider.comments,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: AddCommentBottomBar(
+                        onAddComment: _showAddCommentSheet,
+                      ),
+                    ),
+                  ],
+                ),
+          isScrollable: false,
+          padding: EdgeInsets.zero,
+        );
+      },
     );
   }
 }

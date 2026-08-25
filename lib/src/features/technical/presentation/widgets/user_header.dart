@@ -5,11 +5,13 @@ import '../../../../core/widgets/user_avatar.dart';
 class UserHeader extends StatelessWidget {
   final String name;
   final String id;
+  final String? imageUrl;
 
   const UserHeader({
     super.key,
     required this.name,
     required this.id,
+    this.imageUrl,
   });
 
   @override
@@ -20,8 +22,8 @@ class UserHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              const UserAvatar(
-                imageUrl: null,
+              UserAvatar(
+                imageUrl: imageUrl,
                 size: 80,
                 showStatusDot: true,
               ),

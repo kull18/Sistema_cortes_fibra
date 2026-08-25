@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/fiber_event.dart';
+import '../../../technical/domain/entities/fiber_event.dart';
 
 class EventStatusChip extends StatelessWidget {
   final FiberEventStatus status;

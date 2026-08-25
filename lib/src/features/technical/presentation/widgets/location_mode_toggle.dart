@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sistema_cortes_fibra/src/features/technical/domain/entities/location_mode.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/location_mode.dart';
 
 class LocationModeToggle extends StatelessWidget {
   final LocationMode selected;

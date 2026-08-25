@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
+import '../providers/central_office_provider.dart';
+import '../../domain/entities/central_office_entity.dart';
 
 class CentralesScreen extends StatefulWidget {
   const CentralesScreen({super.key});
@@ -14,6 +17,16 @@ class CentralesScreen extends StatefulWidget {
 }
 
 class _CentralesScreenState extends State<CentralesScreen> {
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CentralOfficeProvider>().loadOffices();
+    });
+  }
+
   void _onTabSelected(AppTab tab) {
     if (tab == AppTab.centrales) return;
 
@@ -35,6 +48,41 @@ class _CentralesScreenState extends State<CentralesScreen> {
     }
   }
 
+  Future<void> _deleteOffice(CentralOfficeEntity office) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Central'),
+        content: Text('¿Está seguro de que desea eliminar la central "${office.name}"? Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('ELIMINAR'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await context.read<CentralOfficeProvider>().deleteOffice(office.id);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Central eliminada correctamente')),
+        );
+      } else if (mounted) {
+        final error = context.read<CentralOfficeProvider>().error;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error ?? 'Error al eliminar central')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -42,88 +90,74 @@ class _CentralesScreenState extends State<CentralesScreen> {
       onTabSelected: _onTabSelected,
       showDivider: true,
       padding: EdgeInsets.zero,
-      isScrollable: false, // FIJO: Evita el error de "Vertical viewport was given unbounded height"
+      isScrollable: false,
       appBar: DetailTopBar(
         title: 'Directorio de Centrales',
         subtitle: 'Nodos de Fibra Óptica Regional',
-        notificationCount: 2,
+        notificationCount: 0,
         onNotificationTap: () => Navigator.of(context).pushNamed('/notifications'),
         onAvatarTap: () => Navigator.of(context).pushReplacementNamed('/perfil'),
       ),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+      body: Consumer<CentralOfficeProvider>(
+        builder: (context, provider, child) {
+          final filteredOffices = provider.offices.where((o) {
+            final query = _searchQuery.toLowerCase();
+            return o.name.toLowerCase().contains(query) ||
+                o.prefix.toLowerCase().contains(query) ||
+                o.city.toLowerCase().contains(query);
+          }).toList();
+
+          return Stack(
             children: [
-              _buildSummaryCard(),
-              const SizedBox(height: 20),
-              _buildSearchBar(),
-              const SizedBox(height: 24),
-              const Text(
-                'Mostrando 5 de 5 centrales',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+              RefreshIndicator(
+                onRefresh: provider.loadOffices,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                  children: [
+                    _buildSummaryCard(provider.offices.length),
+                    const SizedBox(height: 20),
+                    _buildSearchBar(),
+                    const SizedBox(height: 24),
+                    if (provider.isLoading && provider.offices.isEmpty)
+                      const Center(child: CircularProgressIndicator())
+                    else if (provider.error != null && provider.offices.isEmpty)
+                      Center(child: Text(provider.error!))
+                    else ...[
+                      Text(
+                        'Mostrando ${filteredOffices.length} de ${provider.offices.length} centrales',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ...filteredOffices.map((office) => _buildCentralCard(office)),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              _buildCentralCard(
-                prefix: 'TGZ-01',
-                name: 'Central Tuxtla Gutiérrez',
-                location: 'Tuxtla Gutiérrez, Chiapas',
-                address: 'Av. Central Poniente #120, Col. Cent',
-                gps: '16.7531° N, -93.1151° W',
-              ),
-              _buildCentralCard(
-                prefix: 'SCH-02',
-                name: 'Central San Cristóbal',
-                location: 'San Cristóbal de las Casas, Chiapas',
-                address: 'Calle Real de Guadalupe #10, Col',
-                gps: '16.7370° N, -92.6376° W',
-              ),
-              _buildCentralCard(
-                prefix: 'SOL-01',
-                name: 'Central Socoltenango',
-                location: 'Socoltenango, Chiapas',
-                address: 'Carretera panamericana Km 4.5',
-                gps: '16.2411° N, -92.3922° W',
-              ),
-              _buildCentralCard(
-                prefix: 'COM-01',
-                name: 'Central Comitán',
-                location: 'Comitán de Domínguez, Chiapas',
-                address: 'Blvd. Belisario Domínguez Km 2.2',
-                gps: '16.2525° N, -92.1331° W',
-              ),
-              _buildCentralCard(
-                prefix: 'TAP-01',
-                name: 'Central Tapachula',
-                location: 'Tapachula, Chiapas',
-                address: 'Calle Central Sur #10, Col. Centro',
-                gps: '14.9085° N, -92.2618° W',
+              Positioned(
+                bottom: 20,
+                right: 16,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(AppRoutes.registrarCentral);
+                  },
+                  backgroundColor: AppColors.primaryBlue,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: const Icon(Icons.add, color: Colors.white, size: 28),
+                ),
               ),
             ],
-          ),
-          Positioned(
-            bottom: 20,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(AppRoutes.registrarCentral);
-              },
-              backgroundColor: AppColors.primaryBlue,
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: const Icon(Icons.add, color: Colors.white, size: 28),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(int count) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -170,7 +204,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Red Troncal TGZ - SCH - SCL - TAP - COM',
+                      'Red Troncal Activa',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary.withOpacity(0.8),
@@ -192,8 +226,8 @@ class _CentralesScreenState extends State<CentralesScreen> {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'CENTRALES ACTIVAS:',
                   style: TextStyle(
                     fontSize: 10,
@@ -202,10 +236,10 @@ class _CentralesScreenState extends State<CentralesScreen> {
                     letterSpacing: 0.5,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  '5 Nodos',
-                  style: TextStyle(
+                  '$count Nodos',
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
@@ -227,8 +261,13 @@ class _CentralesScreenState extends State<CentralesScreen> {
         border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
       ),
       child: TextField(
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value;
+          });
+        },
         decoration: InputDecoration(
-          hintText: 'Buscar por prefijo (TGZ, SCH), ciudad o tipo de nod...',
+          hintText: 'Buscar por prefijo, ciudad o nombre...',
           hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.4), fontSize: 13),
           prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
           border: InputBorder.none,
@@ -238,13 +277,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
     );
   }
 
-  Widget _buildCentralCard({
-    required String prefix,
-    required String name,
-    required String location,
-    required String address,
-    required String gps,
-  }) {
+  Widget _buildCentralCard(CentralOfficeEntity office) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -263,24 +296,52 @@ class _CentralesScreenState extends State<CentralesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primaryBlueSoft,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '[$prefix]',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-                color: AppColors.primaryBlue,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlueSoft,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '[${office.prefix}]',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryBlue,
+                  ),
+                ),
               ),
-            ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.registrarCentral,
+                      arguments: office,
+                    );
+                  } else if (value == 'delete') {
+                    _deleteOffice(office);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Text('Editar'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           Text(
-            name,
+            office.name,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
@@ -289,7 +350,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
           ),
           const SizedBox(height: 2),
           Text(
-            location,
+            office.city,
             style: const TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
@@ -298,33 +359,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
           ),
           const SizedBox(height: 16),
           Container(
-            width: double.infinity, // Ancho completo
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.1)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 18, color: AppColors.primaryBlue),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    address,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity, // Ancho completo igual que el de arriba
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
@@ -345,7 +380,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  gps,
+                  '${office.latitude.toStringAsFixed(4)}° N, ${office.longitude.toStringAsFixed(4)}° W',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
@@ -360,7 +395,9 @@ class _CentralesScreenState extends State<CentralesScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Ver ficha detalle
+                  },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3)),
@@ -391,7 +428,9 @@ class _CentralesScreenState extends State<CentralesScreen> {
                     color: const Color(0xFFF1F5F9),
                   ),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Ver en mapa
+                    },
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

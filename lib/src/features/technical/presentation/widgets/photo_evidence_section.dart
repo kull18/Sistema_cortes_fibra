@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/numbered_section_card.dart';
-import '../../models/photo_evidence.dart';
+import '../../domain/entities/photo_evidence.dart';
 import 'photo_evidence_tile.dart';
 
 class PhotoEvidenceSection extends StatelessWidget {

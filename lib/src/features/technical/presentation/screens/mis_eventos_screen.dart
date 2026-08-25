@@ -3,7 +3,7 @@ import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
-import '../../models/fiber_event.dart';
+import '../../domain/entities/fiber_event.dart';
 import '../widgets/detailed_event_card.dart';
 import '../widgets/incidencias_summary_card.dart';
 

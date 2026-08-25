@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../models/fiber_event.dart';
-import '../../models/technical_comment.dart';
+import '../../domain/entities/fiber_event.dart';
+import '../../domain/entities/technical_comment.dart';
 import 'event_detail_main_info.dart';
 import 'event_detail_location_map.dart';
 import 'technical_comments_section.dart';

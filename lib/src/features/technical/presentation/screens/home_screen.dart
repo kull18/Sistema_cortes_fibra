@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_top_bar.dart';
-import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
-import '../../models/fiber_event.dart';
+import '../../../../core/widgets/app_bottom_nav_bar.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/home_provider.dart';
 import '../widgets/welcome_hero_card.dart';
 import '../widgets/quick_access_section.dart';
 import '../widgets/events_section.dart';
@@ -18,47 +20,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  EventFilter _selectedFilter = EventFilter.todos;
-
-  // TODO: reemplazar por datos reales desde el backend (GET /eventos)
-  final List<FiberEvent> _events = const [
-    FiberEvent(
-      id: 'EV-2025-041',
-      title: 'Corte Total de Fibra Monomodo',
-      description: 'Se reporta pérdida total de señal en tramo principal.',
-      originPrefix: 'TGZ',
-      destinationPrefix: 'SCH',
-      kmReference: 'Km 14.2',
-      location: 'Tuxtla Gutiérrez - Berriozábal',
-      timeLabel: 'Hace 25 min',
-      reporterName: 'Carlos Mendoza',
-      status: FiberEventStatus.activo,
-    ),
-    FiberEvent(
-      id: 'EV-2025-039',
-      title: 'Atenuación Severa en Empalme',
-      description: 'Niveles de potencia por debajo del estándar en OLT.',
-      originPrefix: 'SCH',
-      destinationPrefix: 'SCL',
-      kmReference: 'Km 22.1',
-      location: 'San Cristóbal de las Casas',
-      timeLabel: 'Hace 1 hora',
-      reporterName: 'Ana Laura Gómez',
-      status: FiberEventStatus.activo,
-    ),
-    FiberEvent(
-      id: 'EV-2025-035',
-      title: 'Fusiones y Reparación de Anillo',
-      description: 'Trabajos de mantenimiento preventivo en infraestructura.',
-      originPrefix: 'TGZ',
-      destinationPrefix: 'SCL',
-      kmReference: 'Km 41.8',
-      location: 'Socoltenango',
-      timeLabel: 'Hoy, 10:15 AM',
-      reporterName: 'Roberto Solís',
-      status: FiberEventStatus.atendido,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Carga inicial de datos al entrar al Home
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeProvider>().initHome();
+    });
+  }
 
   void _onTabSelected(AppTab tab) {
     if (tab == AppTab.inicio) return;
@@ -83,11 +52,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final homeProvider = context.watch<HomeProvider>();
+    final user = authProvider.user;
+    final isAdmin = user?.role == 'ADMIN';
+
     return AppScaffold(
       currentTab: AppTab.inicio,
       onTabSelected: _onTabSelected,
       appBar: AppTopBar(
-        notificationCount: 3,
+        notificationCount: homeProvider.unreadCount,
+        avatarUrl: user?.profilePhotoUrl, // Ahora muestra la foto del usuario en el Home
         onNotificationTap: () {
           Navigator.of(context).pushNamed(AppRoutes.notifications);
         },
@@ -95,42 +70,79 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         },
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const WelcomeHeroCard(
-            technicianName: 'Carlos Mendoza',
+      body: RefreshIndicator(
+        onRefresh: () => homeProvider.initHome(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              WelcomeHeroCard(
+                technicianName: user?.fullName ?? 'Técnico',
+              ),
+              const SizedBox(height: 24),
+              QuickAccessSection(
+                showCentrales: isAdmin,
+                onMapaGeneral: () {
+                  // TODO: navegar a Mapa General
+                },
+                onCentrales: () {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
+                },
+                onHistorial: () {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
+                },
+                onMisPublicaciones: () {
+                  Navigator.of(context).pushNamed(AppRoutes.misEventos);
+                },
+              ),
+              const SizedBox(height: 24),
+              if (homeProvider.isLoading && homeProvider.events.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else if (homeProvider.errorMessage != null && homeProvider.events.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.error_outline, color: AppColors.statusRed, size: 48),
+                        const SizedBox(height: 16),
+                        Text(
+                          homeProvider.errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: AppColors.textSecondary),
+                        ),
+                        TextButton(
+                          onPressed: () => homeProvider.initHome(),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                EventsSection(
+                  events: homeProvider.events,
+                  selectedFilter: homeProvider.selectedFilter,
+                  onFilterChanged: (filter) {
+                    homeProvider.setFilter(filter);
+                  },
+                  onVerTodos: () {
+                    Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
+                  },
+                  onEventTap: (event) {
+                    Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
+                  },
+                ),
+              const SizedBox(height: 24),
+            ],
           ),
-          const SizedBox(height: 24),
-          QuickAccessSection(
-            onMapaGeneral: () {
-              // TODO: navegar a Mapa General
-            },
-            onCentrales: () {
-              Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
-            },
-            onHistorial: () {
-              Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
-            },
-            onMisPublicaciones: () {
-              Navigator.of(context).pushNamed(AppRoutes.misEventos);
-            },
-          ),
-          const SizedBox(height: 24),
-          EventsSection(
-            events: _events,
-            selectedFilter: _selectedFilter,
-            onFilterChanged: (filter) {
-              setState(() => _selectedFilter = filter);
-            },
-            onVerTodos: () {
-              Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
-            },
-            onEventTap: (event) {
-              Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

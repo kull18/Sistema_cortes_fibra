@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/fiber_event.dart';
+import '../../domain/entities/fiber_event.dart';
 import 'event_status_chip.dart';
 
 class EventCard extends StatelessWidget {

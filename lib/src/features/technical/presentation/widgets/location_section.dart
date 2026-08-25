@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/models/central.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/numbered_section_card.dart';
-import '../../models/location_mode.dart';
+import '../../domain/entities/location_mode.dart';
 import 'location_mode_toggle.dart';
 import 'map_preview_card.dart';
 import 'distance_slider_card.dart';

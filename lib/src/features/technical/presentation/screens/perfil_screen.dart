@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
+import 'package:sistema_cortes_fibra/src/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_info_card.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_setting_section.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/logout_button.dart';
@@ -27,7 +29,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar estados desde AppPreferences
     _notificaciones = AppPreferences.notificationsEnabled;
     _sincronizacion = AppPreferences.offlineSyncEnabled;
     _gpsAltaPrecision = AppPreferences.highPrecisionGpsEnabled;
@@ -57,12 +58,16 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+
     return AppScaffold(
       currentTab: AppTab.perfil,
       onTabSelected: _onTabSelected,
       appBar: AppTopBar(
         appTitle: 'Perfil Técnico',
         notificationCount: 2,
+        avatarUrl: user?.profilePhotoUrl, // Vinculado el avatar del TopBar
         onNotificationTap: () {},
         onAvatarTap: () {},
       ),
@@ -70,16 +75,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
         padding: const EdgeInsets.symmetric(vertical: 24),
         child: Column(
           children: [
-            const UserHeader(
-              name: 'Carlos Mendoza',
-              id: 'FT-8942',
+            UserHeader(
+              name: user?.fullName ?? 'Técnico SCF',
+              id: user?.technicianCode ?? 'FT-0000',
+              imageUrl: user?.profilePhotoUrl, // Vinculada la imagen real del perfil
             ),
             const SizedBox(height: 24),
             
-            const BuildInfoCard(
-              role: 'Fusionador',
-              phone: '+52 961 482 9910',
-              email: 'c.mendoza@fibertech.com',
+            BuildInfoCard(
+              role: user?.role ?? 'Personal Técnico',
+              phone: '+52 --- --- ----',
+              email: user?.email ?? 'Sin correo asignado',
             ),
             const SizedBox(height: 24),
 
@@ -106,21 +112,23 @@ class _PerfilScreenState extends State<PerfilScreen> {
               onModoOscuroChanged: (v) async {
                 await AppPreferences.setDarkModeEnabled(v);
                 setState(() => _modoOscuro = v);
-                // Opcional: Notificar a la app el cambio de tema aquí
               },
             ),
             const SizedBox(height: 24),
 
             SecuritySection(
               onChangePassword: () {
-                // TODO: Implementar cambio de contraseña
+                Navigator.of(context).pushNamed(AppRoutes.changePassword);
               },
             ),
             const SizedBox(height: 32),
 
             LogoutButton(
-              onLogout: () {
-                Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+              onLogout: () async {
+                await authProvider.logout();
+                if (mounted) {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+                }
               },
             ),
             const SizedBox(height: 40),
