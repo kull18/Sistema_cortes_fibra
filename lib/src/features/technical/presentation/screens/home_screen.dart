@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../domain/entities/fiber_event.dart';
 import '../providers/home_provider.dart';
 import '../widgets/welcome_hero_card.dart';
 import '../widgets/quick_access_section.dart';
@@ -20,10 +22,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Datos fake para el esqueleto de eventos
+  final List<FiberEvent> _fakeEvents = List.generate(
+    3,
+    (index) => FiberEvent(
+      id: 'EV-2025-000',
+      title: 'Corte Total de Fibra Monomodo',
+      description: 'Corte detectado en el tramo principal, afectando servicios.',
+      originPrefix: 'XXX',
+      destinationPrefix: 'YYY',
+      kmReference: 'Km 00.0',
+      location: 'Ubicación del incidente en carretera',
+      timeLabel: 'Hace 0 min',
+      reporterName: 'Nombre del Técnico',
+      status: FiberEventStatus.activo,
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
-    // Carga inicial de datos al entrar al Home
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomeProvider>().initHome();
     });
@@ -57,12 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = authProvider.user;
     final isAdmin = user?.role == 'ADMIN';
 
+    final showSkeleton = homeProvider.isLoading && homeProvider.events.isEmpty;
+
     return AppScaffold(
       currentTab: AppTab.inicio,
       onTabSelected: _onTabSelected,
       appBar: AppTopBar(
         notificationCount: homeProvider.unreadCount,
-        avatarUrl: user?.profilePhotoUrl, // Ahora muestra la foto del usuario en el Home
+        avatarUrl: user?.profilePhotoUrl,
         onNotificationTap: () {
           Navigator.of(context).pushNamed(AppRoutes.notifications);
         },
@@ -97,14 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              if (homeProvider.isLoading && homeProvider.events.isEmpty)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(40.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              else if (homeProvider.errorMessage != null && homeProvider.events.isEmpty)
+              if (homeProvider.errorMessage != null && homeProvider.events.isEmpty)
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(40.0),
@@ -126,18 +139,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               else
-                EventsSection(
-                  events: homeProvider.events,
-                  selectedFilter: homeProvider.selectedFilter,
-                  onFilterChanged: (filter) {
-                    homeProvider.setFilter(filter);
-                  },
-                  onVerTodos: () {
-                    Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
-                  },
-                  onEventTap: (event) {
-                    Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
-                  },
+                Skeletonizer(
+                  enabled: showSkeleton,
+                  child: EventsSection(
+                    events: showSkeleton ? _fakeEvents : homeProvider.events,
+                    selectedFilter: homeProvider.selectedFilter,
+                    onFilterChanged: (filter) {
+                      homeProvider.setFilter(filter);
+                    },
+                    onVerTodos: () {
+                      Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
+                    },
+                    onEventTap: (event) {
+                      Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
+                    },
+                  ),
                 ),
               const SizedBox(height: 24),
             ],
