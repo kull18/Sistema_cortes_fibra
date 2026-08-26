@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -22,6 +24,23 @@ class EventosScreen extends StatefulWidget {
 class _EventosScreenState extends State<EventosScreen> {
   final _searchController = TextEditingController();
 
+  // Datos fake para el esqueleto
+  final List<FiberEvent> _fakeEvents = List.generate(
+    4,
+    (index) => FiberEvent(
+      id: 'EV-2025-000',
+      title: 'Corte Total de Fibra Monomodo',
+      description: 'Descripción detallada del incidente para el skeletonizer.',
+      originPrefix: 'XXX',
+      destinationPrefix: 'YYY',
+      kmReference: 'Km 00.0',
+      location: 'Ubicación referencial en carretera',
+      timeLabel: 'Hace 0 min',
+      reporterName: 'Nombre del Técnico',
+      status: FiberEventStatus.activo,
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -41,18 +60,18 @@ class _EventosScreenState extends State<EventosScreen> {
 
     switch (tab) {
       case AppTab.inicio:
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         break;
       case AppTab.centrales:
-        Navigator.of(context).pushReplacementNamed('/centrales');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
         break;
       case AppTab.reportar:
-        Navigator.of(context).pushNamed('/reportar-evento');
+        Navigator.of(context).pushNamed(AppRoutes.reportarEvento);
         break;
       case AppTab.eventos:
         break;
       case AppTab.perfil:
-        Navigator.of(context).pushReplacementNamed('/perfil');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         break;
     }
   }
@@ -61,41 +80,48 @@ class _EventosScreenState extends State<EventosScreen> {
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, provider, child) {
-        final filteredEvents = provider.events.where((event) {
-          final query = _searchController.text.toLowerCase();
-          return event.id.toLowerCase().contains(query) ||
-              event.description.toLowerCase().contains(query) ||
-              event.location.toLowerCase().contains(query);
-        }).toList();
+        final showSkeleton = provider.isLoading && provider.events.isEmpty;
+        
+        final filteredEvents = showSkeleton 
+            ? _fakeEvents 
+            : provider.events.where((event) {
+                final query = _searchController.text.toLowerCase();
+                return event.id.toLowerCase().contains(query) ||
+                    event.description.toLowerCase().contains(query) ||
+                    event.location.toLowerCase().contains(query);
+              }).toList();
 
-        final activosCount = provider.events.where((e) => e.status == FiberEventStatus.activo).length;
-        final cerradosCount = provider.events.where((e) => e.status == FiberEventStatus.cerrado).length;
+        final activosCount = showSkeleton ? 0 : provider.events.where((e) => e.status == FiberEventStatus.activo).length;
+        final cerradosCount = showSkeleton ? 0 : provider.events.where((e) => e.status == FiberEventStatus.cerrado).length;
 
         return AppScaffold(
           currentTab: AppTab.eventos,
           onTabSelected: _onTabSelected,
-          isScrollable: false, // IMPORTANTE: Evita el conflicto de scroll con el ListView interno
+          isScrollable: false,
           appBar: AppTopBar(
             appTitle: 'Eventos',
             subtitle: 'Registro de eventos',
             notificationCount: provider.unreadCount,
             onNotificationTap: () {
-              Navigator.of(context).pushNamed('/notifications');
+              Navigator.of(context).pushNamed(AppRoutes.notifications);
             },
             onAvatarTap: () {
-              Navigator.of(context).pushReplacementNamed('/perfil');
+              Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
             },
           ),
           body: RefreshIndicator(
             onRefresh: () => provider.fetchEvents(),
             child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(), // Asegura que el RefreshIndicator funcione
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(bottom: 100),
               children: [
-                IncidenciasSummaryCard(
-                  total: provider.events.length,
-                  activos: activosCount,
-                  cerrados: cerradosCount,
+                Skeletonizer(
+                  enabled: showSkeleton,
+                  child: IncidenciasSummaryCard(
+                    total: showSkeleton ? 0 : provider.events.length,
+                    activos: activosCount,
+                    cerrados: cerradosCount,
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -147,14 +173,7 @@ class _EventosScreenState extends State<EventosScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                if (provider.isLoading && provider.events.isEmpty)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(40.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                else if (provider.errorMessage != null && provider.events.isEmpty)
+                if (provider.errorMessage != null && provider.events.isEmpty)
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(40.0),
@@ -165,28 +184,38 @@ class _EventosScreenState extends State<EventosScreen> {
                       ),
                     ),
                   )
-                else if (filteredEvents.isEmpty)
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(40.0),
-                        child: Text('No se encontraron eventos.'),
-                      ),
-                    )
-                  else
-                    ...filteredEvents.map((event) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: DetailedEventCard(
-                        event: event,
-                        onVerDetalle: () {
-                          Navigator.of(context).pushNamed('/event-detail', arguments: event);
-                        },
-                      ),
-                    )),
+                else if (filteredEvents.isEmpty && !showSkeleton)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40.0),
+                      child: Text('No se encontraron eventos.'),
+                    ),
+                  )
+                else
+                  Skeletonizer(
+                    enabled: showSkeleton,
+                    child: Column(
+                      children: filteredEvents.map((event) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: DetailedEventCard(
+                          event: event,
+                          onVerDetalle: () {
+                            Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
+                          },
+                        ),
+                      )).toList(),
+                    ),
+                  ),
 
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: MapGeneralCard(onTap: () {}),
+                  child: Skeletonizer(
+                    enabled: showSkeleton,
+                    child: MapGeneralCard(onTap: () {
+                      Navigator.of(context).pushNamed(AppRoutes.mapaGeneral);
+                    }),
+                  ),
                 ),
               ],
             ),

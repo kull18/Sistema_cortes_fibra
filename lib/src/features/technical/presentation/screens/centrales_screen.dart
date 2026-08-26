@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -19,6 +20,21 @@ class CentralesScreen extends StatefulWidget {
 class _CentralesScreenState extends State<CentralesScreen> {
   String _searchQuery = '';
 
+  // Datos fake para el esqueleto
+  final List<CentralOfficeEntity> _fakeOffices = List.generate(
+    5,
+    (index) => CentralOfficeEntity(
+      id: index,
+      prefix: 'XXX',
+      name: 'Nombre de la Central de Fibra',
+      city: 'Ciudad del Nodo',
+      latitude: 0.0,
+      longitude: 0.0,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -32,18 +48,18 @@ class _CentralesScreenState extends State<CentralesScreen> {
 
     switch (tab) {
       case AppTab.inicio:
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         break;
       case AppTab.centrales:
         break;
       case AppTab.reportar:
-        Navigator.of(context).pushNamed('/reportar-evento');
+        Navigator.of(context).pushNamed(AppRoutes.reportarEvento);
         break;
       case AppTab.eventos:
-        Navigator.of(context).pushReplacementNamed('/eventos');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
         break;
       case AppTab.perfil:
-        Navigator.of(context).pushReplacementNamed('/perfil');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         break;
     }
   }
@@ -95,17 +111,20 @@ class _CentralesScreenState extends State<CentralesScreen> {
         title: 'Directorio de Centrales',
         subtitle: 'Nodos de Fibra Óptica Regional',
         notificationCount: 0,
-        onNotificationTap: () => Navigator.of(context).pushNamed('/notifications'),
-        onAvatarTap: () => Navigator.of(context).pushReplacementNamed('/perfil'),
+        onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+        onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
       ),
       body: Consumer<CentralOfficeProvider>(
         builder: (context, provider, child) {
-          final filteredOffices = provider.offices.where((o) {
-            final query = _searchQuery.toLowerCase();
-            return o.name.toLowerCase().contains(query) ||
-                o.prefix.toLowerCase().contains(query) ||
-                o.city.toLowerCase().contains(query);
-          }).toList();
+          final showSkeleton = provider.isLoading && provider.offices.isEmpty;
+          final displayedOffices = showSkeleton 
+              ? _fakeOffices 
+              : provider.offices.where((o) {
+                  final query = _searchQuery.toLowerCase();
+                  return o.name.toLowerCase().contains(query) ||
+                      o.prefix.toLowerCase().contains(query) ||
+                      o.city.toLowerCase().contains(query);
+                }).toList();
 
           return Stack(
             children: [
@@ -114,25 +133,34 @@ class _CentralesScreenState extends State<CentralesScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
                   children: [
-                    _buildSummaryCard(provider.offices.length),
+                    Skeletonizer(
+                      enabled: showSkeleton,
+                      child: _buildSummaryCard(showSkeleton ? 0 : provider.offices.length),
+                    ),
                     const SizedBox(height: 20),
                     _buildSearchBar(),
                     const SizedBox(height: 24),
-                    if (provider.isLoading && provider.offices.isEmpty)
-                      const Center(child: CircularProgressIndicator())
-                    else if (provider.error != null && provider.offices.isEmpty)
+                    if (provider.error != null && provider.offices.isEmpty)
                       Center(child: Text(provider.error!))
                     else ...[
-                      Text(
-                        'Mostrando ${filteredOffices.length} de ${provider.offices.length} centrales',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                      Skeletonizer(
+                        enabled: showSkeleton,
+                        child: Text(
+                          'Mostrando ${displayedOffices.length} de ${provider.offices.length} centrales',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ...filteredOffices.map((office) => _buildCentralCard(office)),
+                      Skeletonizer(
+                        enabled: showSkeleton,
+                        child: Column(
+                          children: displayedOffices.map((office) => _buildCentralCard(office)).toList(),
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -314,29 +342,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                   ),
                 ),
               ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
-                onSelected: (value) {
-                  if (value == 'edit') {
-                    Navigator.of(context).pushNamed(
-                      AppRoutes.registrarCentral,
-                      arguments: office,
-                    );
-                  } else if (value == 'delete') {
-                    _deleteOffice(office);
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text('Editar'),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Text('Eliminar', style: TextStyle(color: Colors.red)),
-                  ),
-                ],
-              ),
+              const Icon(Icons.more_vert, color: AppColors.textSecondary),
             ],
           ),
           const SizedBox(height: 10),
@@ -395,9 +401,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {
-                    // Ver ficha detalle
-                  },
+                  onPressed: () {},
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3)),
@@ -428,9 +432,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                     color: const Color(0xFFF1F5F9),
                   ),
                   child: TextButton(
-                    onPressed: () {
-                      // Ver en mapa
-                    },
+                    onPressed: () {},
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
