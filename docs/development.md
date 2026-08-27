@@ -5,7 +5,7 @@
 - Flutter SDK (canal stable)
 - Android Studio (emulador Android) y/o Xcode (simulador iOS)
 - Cuenta de Google Cloud con Maps SDK habilitado (ver [maps.md](maps.md))
-- Acceso a la [API de SCF](../scf/README.md) corriendo (local o `https://scf-api.shop`)
+- Acceso a la [API de SCF](../scf/README.md) corriendo (local)
 
 ## Setup local
 
@@ -21,7 +21,7 @@ La URL base de la API se pasa por `--dart-define`, no por archivo `.env`:
 
 ```bash
 flutter run --dart-define=API_BASE_URL=http://localhost:8000   # backend local
-flutter run --dart-define=API_BASE_URL=https://scf-api.shop     # backend en producción
+flutter run --dart-define=API_BASE_URL=     # backend en producción
 ```
 
 Si no se pasa el flag, `ApiConfig.baseUrl` usa el `defaultValue` definido en `core/api/api_config.dart` — confirma que apunte a donde esperas antes de correr.
@@ -53,14 +53,14 @@ Ninguna de estas credenciales va en el repositorio — pide al equipo los valore
 ## Correr la app
 
 ```bash
-flutter run --dart-define=API_BASE_URL=https://scf-api.shop
+flutter run --dart-define=API_BASE_URL=
 ```
 
 Para un dispositivo/emulador específico:
 
 ```bash
 flutter devices
-flutter run -d <device-id> --dart-define=API_BASE_URL=https://scf-api.shop
+flutter run -d <device-id> --dart-define=API_BASE_URL=
 ```
 
 ## Convención de ramas

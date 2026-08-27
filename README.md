@@ -10,7 +10,7 @@ Aplicación móvil Flutter para que técnicos de campo reporten cortes de fibra 
 | [Screens](docs/screens.md) | Inventario de pantallas, componentes y endpoints que usa cada una |
 | [Integración con la API](docs/api-integration.md) | Contrato `IApi`, manejo de errores, inventario completo de endpoints |
 | [Trabajo sin conexión](docs/offline-sync.md) | Caché local, cola de sincronización de eventos y fotos offline |
-
+| [Maquetado](docs/mockups.md) | Capturas de referencia del diseño de cada pantalla (Visily) |
 ## Stack
 
 - Flutter / Dart
@@ -28,7 +28,7 @@ Aplicación móvil Flutter para que técnicos de campo reporten cortes de fibra 
 
 ```bash
 flutter pub get
-flutter run --dart-define=API_BASE_URL=https://scf-api.shop
+flutter run --dart-define=API_BASE_URL=
 ```
 
 Ver [docs/architecture.md](docs/architecture.md) para la estructura de carpetas completa y [docs/api-integration.md](docs/api-integration.md) para la configuración de la capa de red.

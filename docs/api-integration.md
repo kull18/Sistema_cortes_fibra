@@ -44,7 +44,7 @@ class ApiConfig {
 ```
 
 ```bash
-flutter run --dart-define=API_BASE_URL=https://scf-api.shop
+flutter run --dart-define=API_BASE_URL=
 ```
 
 ## Inventario de endpoints por dominio
