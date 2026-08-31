@@ -27,7 +27,6 @@ class EventDetailMainInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row: Folio, Priority, Status - FIXED FOR OVERFLOW
           Row(
             children: [
               Container(
@@ -50,16 +49,6 @@ class EventDetailMainInfo extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            event.title,
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 10),
           Row(
             children: [
               SvgPicture.asset(

@@ -11,6 +11,8 @@ class FiberEvent {
   final String timeLabel;
   final String reporterName;
   final FiberEventStatus status;
+  final double? latitude;
+  final double? longitude;
 
   const FiberEvent({
     required this.id,
@@ -23,5 +25,7 @@ class FiberEvent {
     required this.timeLabel,
     required this.reporterName,
     required this.status,
+    this.latitude,
+    this.longitude,
   });
 }

@@ -18,8 +18,10 @@ class TechnicalMapper {
       kmReference: 'Km ${model.distanceToOrigin?.toStringAsFixed(1) ?? '0.0'}',
       location: model.fieldReference ?? '${model.originOffice.city} - ${model.destinationOffice.city}',
       timeLabel: _formatTimeLabel(model.reportedAt),
-      reporterName: 'ID: ${model.reportedById}', // El backend no devuelve el nombre directamente aquí
+      reporterName: 'ID: ${model.reportedById}', 
       status: _mapStatus(model.status),
+      latitude: model.latitude,
+      longitude: model.longitude,
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sistema_cortes_fibra/my_app.dart';
 import 'package:sistema_cortes_fibra/src/core/di/app_container.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
@@ -16,13 +15,10 @@ import 'package:sistema_cortes_fibra/src/features/technical/presentation/provide
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 1. Cargar variables de entorno
-  await dotenv.load(fileName: ".env");
-
-  // 2. Inicializar Preferencias
+  // 1. Inicializar Preferencias
   await AppPreferences.init();
 
-  // 3. Inicializar Contenedor de Dependencias
+  // 2. Inicializar Contenedor de Dependencias
   final container = AppContainer();
   await container.init();
 

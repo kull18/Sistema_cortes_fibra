@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Datos fake para el esqueleto de eventos
   final List<FiberEvent> _fakeEvents = List.generate(
     3,
-    (index) => FiberEvent(
+        (index) => FiberEvent(
       id: 'EV-2025-000',
       title: 'Corte Total de Fibra Monomodo',
       description: 'Corte detectado en el tramo principal, afectando servicios.',
@@ -80,6 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppScaffold(
       currentTab: AppTab.inicio,
       onTabSelected: _onTabSelected,
+      isScrollable: false, // Desactivamos el scroll del scaffold porque HomeScreen ya tiene SingleChildScrollView
+      padding: EdgeInsets.zero, // Quitamos padding para que el RefreshIndicator cubra todo
       appBar: AppTopBar(
         notificationCount: homeProvider.unreadCount,
         avatarUrl: user?.profilePhotoUrl,
@@ -94,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onRefresh: () => homeProvider.initHome(),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

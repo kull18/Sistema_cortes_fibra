@@ -65,18 +65,21 @@ class PhotoEvidenceSection extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             )
-          : Column(
-              children: evidences
-                  .map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: PhotoEvidenceTile(
-                        evidence: e,
-                        onDelete: () => onDelete(e),
+          : Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Column(
+                children: evidences
+                    .map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: PhotoEvidenceTile(
+                          evidence: e,
+                          onDelete: () => onDelete(e),
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
     );
   }

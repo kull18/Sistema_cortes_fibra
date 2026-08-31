@@ -3,11 +3,17 @@ import '../../../../core/app_colors.dart';
 
 class AddTechnicalNoteModal extends StatefulWidget {
   final String eventId;
-  final Function(String) onSave;
+  final String userName;
+  final String technicianCode;
+  final String? avatarUrl;
+  final Future<bool> Function(String) onSave;
 
   const AddTechnicalNoteModal({
     super.key,
     required this.eventId,
+    required this.userName,
+    required this.technicianCode,
+    this.avatarUrl,
     required this.onSave,
   });
 
@@ -18,6 +24,7 @@ class AddTechnicalNoteModal extends StatefulWidget {
 class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
   final TextEditingController _controller = TextEditingController();
   int _charCount = 0;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -90,7 +97,7 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _isSaving ? null : () => Navigator.pop(context),
                   icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
                 ),
               ],
@@ -118,14 +125,19 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                           Container(
                             width: 48,
                             height: 48,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFE2E8F0),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE2E8F0),
                               shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: NetworkImage('https://i.pravatar.cc/150?u=carlos'),
-                                fit: BoxFit.cover,
-                              ),
+                              image: widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: NetworkImage(widget.avatarUrl!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
                             ),
+                            child: widget.avatarUrl == null || widget.avatarUrl!.isEmpty
+                                ? const Icon(Icons.person, color: Colors.grey)
+                                : null,
                           ),
                           Positioned(
                             right: 0,
@@ -146,16 +158,16 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Ing. Carlos Mendoza',
-                            style: TextStyle(
+                          Text(
+                            widget.userName,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 14,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           Text(
-                            'Ficha: ${widget.eventId}',
+                            'Ficha: ${widget.technicianCode}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -180,7 +192,7 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                       ),
                     ),
                     Text(
-                      '$_charCount / 500',
+                      '$_charCount / 1000',
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -193,7 +205,8 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                 TextField(
                   controller: _controller,
                   maxLines: 5,
-                  maxLength: 500,
+                  maxLength: 1000,
+                  enabled: !_isSaving,
                   buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
                   decoration: InputDecoration(
                     hintText: 'Describe el avance o situación en campo...',
@@ -217,9 +230,13 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      widget.onSave(_controller.text);
+                  onPressed: _isSaving ? null : () async {
+                    if (_controller.text.trim().isNotEmpty) {
+                      setState(() => _isSaving = true);
+                      final success = await widget.onSave(_controller.text.trim());
+                      if (mounted && !success) {
+                        setState(() => _isSaving = false);
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -231,24 +248,33 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.send_outlined, size: 20),
-                      SizedBox(width: 10),
-                      Text(
-                        'Guardar Comentario',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send_outlined, size: 20),
+                            SizedBox(width: 10),
+                            Text(
+                              'Guardar Comentario',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _isSaving ? null : () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
                     side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3)),

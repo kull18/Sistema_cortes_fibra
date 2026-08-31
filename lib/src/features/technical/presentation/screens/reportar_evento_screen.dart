@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../core/models/central.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
@@ -9,6 +10,7 @@ import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/preferences/user_preferences.dart';
+import '../../../../core/location/location_service.dart';
 import '../../../technical/domain/entities/location_mode.dart';
 import '../../../technical/domain/entities/photo_evidence.dart';
 import '../widgets/reportar_hero_banner.dart';
@@ -32,22 +34,24 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
   Central? _destination;
 
   LocationMode _locationMode = LocationMode.gps;
-  double _kmOnSegment = 18.5;
-  double? _latitude = 16.7528;
-  double? _longitude = -93.1152;
-  final double _gpsPrecision = 2.1;
+  double _kmOnSegment = 0.0;
+  double? _latitude;
+  double? _longitude;
+  double? _accuracy;
 
   final _referenceController = TextEditingController();
   final _descriptionController = TextEditingController();
 
   final List<PhotoEvidence> _evidences = [];
   final ImagePicker _picker = ImagePicker();
+  final LocationService _locationService = LocationService();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CentralOfficeProvider>().loadOffices();
+      _useCurrentLocation(); // Intentar obtener ubicación al iniciar
     });
   }
 
@@ -58,9 +62,36 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
     super.dispose();
   }
 
+  Future<void> _useCurrentLocation() async {
+    try {
+      final position = await _locationService.getCurrentPosition();
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+        _accuracy = position.accuracy;
+        _locationMode = LocationMode.gps;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _handleManualLocationChange(LatLng position) {
+    setState(() {
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+      _accuracy = null; // Regla: MAP no lleva accuracy
+      _locationMode = LocationMode.manual;
+    });
+  }
+
   double get _totalDistanceKm {
     if (_origin == null || _destination == null) return 0;
-    return 35.8;
+    return 35.8; // Valor simulado o calculado entre centrales
   }
 
   void _handleSwap() {
@@ -105,6 +136,13 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
       return;
     }
 
+    if (_latitude == null || _longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor establezca la ubicación del incidente')),
+      );
+      return;
+    }
+
     if (_descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor ingrese una descripción')),
@@ -115,10 +153,10 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
     final event = await context.read<ReportEventProvider>().reportEvent(
       originOfficeId: int.parse(_origin!.id),
       destinationOfficeId: int.parse(_destination!.id),
-      latitude: _latitude ?? 0.0,
-      longitude: _longitude ?? 0.0,
+      latitude: _latitude!,
+      longitude: _longitude!,
       locationMethod: _locationMode == LocationMode.gps ? 'GPS' : 'MAP',
-      accuracy: _locationMode == LocationMode.gps ? _gpsPrecision : null,
+      accuracy: _accuracy,
       fieldReference: _referenceController.text,
       description: _descriptionController.text,
       evidences: _evidences,
@@ -127,7 +165,6 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
     if (mounted) {
       if (event != null) {
         final currentUser = await UserPreferences.getUser();
-        
         if (mounted) {
           Navigator.of(context).pushReplacementNamed(
             AppRoutes.confirmacionRegistro,
@@ -153,7 +190,6 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
 
     final centrales = officeProvider.offices.map((e) => Central.fromEntity(e)).toList();
 
-    // Lógica para selecciones iniciales por defecto cuando se cargan los datos
     if (_origin == null && centrales.isNotEmpty) {
       _origin = centrales[0];
     }
@@ -170,7 +206,7 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
       },
       appBar: DetailTopBar(
         title: 'Reporte de Evento',
-        notificationCount: 2,
+        notificationCount: 0,
         onNotificationTap: () {},
         onAvatarTap: () {},
       ),
@@ -201,13 +237,15 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
               onModeChanged: (m) => setState(() => _locationMode = m),
               latitude: _latitude,
               longitude: _longitude,
-              gpsPrecisionMeters: _gpsPrecision,
+              gpsAccuracy: _accuracy,
               kmOnSegment: _kmOnSegment,
               origin: _origin,
               destination: _destination,
               totalDistanceKm: _totalDistanceKm,
               onKmChanged: (v) => setState(() => _kmOnSegment = v),
               referenceController: _referenceController,
+              onLocationChanged: _handleManualLocationChange,
+              onUseGps: _useCurrentLocation,
             ),
             const SizedBox(height: 16),
             DiagnosisSection(descriptionController: _descriptionController),

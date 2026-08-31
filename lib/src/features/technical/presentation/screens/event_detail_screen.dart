@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/domain/entities/fiber_event.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../widgets/event_detail_app_bar.dart';
 import '../widgets/event_detail_body.dart';
 import '../widgets/add_comment_bottom_bar.dart';
@@ -49,6 +50,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   void _showAddCommentSheet() {
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.user;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -57,16 +61,32 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: AddTechnicalNoteModal(
           eventId: widget.event.id,
+          userName: user?.fullName ?? 'Técnico',
+          technicianCode: user?.technicianCode ?? 'N/A',
+          avatarUrl: user?.profilePhotoUrl,
           onSave: (content) async {
-            final success = await context.read<EventDetailProvider>().addComment(content);
-            if (mounted && success) {
+            final provider = context.read<EventDetailProvider>();
+            final success = await provider.addComment(content);
+            
+            if (!mounted) return false;
+
+            if (success) {
               Navigator.pop(context);
-            } else if (mounted) {
-              final error = context.read<EventDetailProvider>().error;
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(error ?? 'Error al agregar comentario')),
+                const SnackBar(
+                  content: Text('Comentario agregado correctamente'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(provider.error ?? 'Error al agregar comentario'),
+                  backgroundColor: Colors.red,
+                ),
               );
             }
+            return success;
           },
         ),
       ),
