@@ -58,15 +58,6 @@ class EventCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            event.title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
           Row(
             children: [
               SvgPicture.asset(

@@ -1,4 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../api/api_service.dart';
 import '../api/biometric_auth_service.dart';
 import '../api/i_api.dart';
@@ -21,9 +20,14 @@ class AppContainer {
   AppContainer._internal();
 
   // Infraestructura
-  static final IApi _api = ApiService(
-    baseUrl: dotenv.env['API_BASE_URL'] ?? '',
+  // 10.0.2.2 es el alias para el host (tu PC) desde el emulador Android.
+  static const String _baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: '',
   );
+
+  static final IApi _api = ApiService(baseUrl: _baseUrl);
+
   static final StorageService _storage = StorageService();
   static final UserService _userService = UserService(_storage);
   static final BiometricAuthService _biometricAuth = BiometricAuthService();
@@ -41,7 +45,7 @@ class AppContainer {
   static final AuthRemoteDataSource _authRemoteDataSource = AuthRemoteDataSourceImpl(
     api: _api,
   );
-  
+
   static final TechnicalRemoteDataSource _technicalRemoteDataSource = TechnicalRemoteDataSourceImpl(
     api: _api,
   );
@@ -62,9 +66,7 @@ class AppContainer {
     pendingPhotoDao: _pendingPhotoDao,
   );
 
-  /// Inicialización asíncrona para restaurar la sesión persistida
   Future<void> init() async {
-    // Inicializar el servicio de sincronización
     _syncService = EventSyncService(
       api: _api, 
       pendingEventDao: _pendingEventDao,

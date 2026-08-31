@@ -69,15 +69,6 @@ class DetailedEventCard extends StatelessWidget {
           const Divider(height: 1, color: AppColors.borderSubtle),
           const SizedBox(height: 12),
           Text(
-            event.title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
             event.description,
             style: const TextStyle(
               fontSize: 12,
