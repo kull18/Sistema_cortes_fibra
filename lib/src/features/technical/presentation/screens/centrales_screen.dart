@@ -7,6 +7,8 @@ import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/home_provider.dart';
 import '../providers/central_office_provider.dart';
 import '../../domain/entities/central_office_entity.dart';
 
@@ -101,6 +103,10 @@ class _CentralesScreenState extends State<CentralesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final homeProvider = context.watch<HomeProvider>();
+    final user = authProvider.user;
+
     return AppScaffold(
       currentTab: AppTab.centrales,
       onTabSelected: _onTabSelected,
@@ -110,7 +116,8 @@ class _CentralesScreenState extends State<CentralesScreen> {
       appBar: DetailTopBar(
         title: 'Directorio de Centrales',
         subtitle: 'Nodos de Fibra Óptica Regional',
-        notificationCount: 0,
+        notificationCount: homeProvider.unreadCount,
+        avatarUrl: user?.profilePhotoUrl,
         onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
         onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
       ),

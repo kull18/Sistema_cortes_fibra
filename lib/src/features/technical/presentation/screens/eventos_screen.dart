@@ -7,6 +7,7 @@ import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/entities/fiber_event.dart';
 import '../widgets/incidencias_summary_card.dart';
 import '../widgets/event_filter_chips.dart';
@@ -78,6 +79,9 @@ class _EventosScreenState extends State<EventosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+
     return Consumer<HomeProvider>(
       builder: (context, provider, child) {
         final showSkeleton = provider.isLoading && provider.events.isEmpty;
@@ -102,6 +106,7 @@ class _EventosScreenState extends State<EventosScreen> {
             appTitle: 'Eventos',
             subtitle: 'Registro de eventos',
             notificationCount: provider.unreadCount,
+            avatarUrl: user?.profilePhotoUrl,
             onNotificationTap: () {
               Navigator.of(context).pushNamed(AppRoutes.notifications);
             },

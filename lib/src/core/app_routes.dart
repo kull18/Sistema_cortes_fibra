@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../features/auth/presentation/screens/splash_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../features/auth/presentation/screens/change_password_screen.dart';
@@ -17,6 +18,7 @@ import '../features/technical/presentation/screens/mapa_general_screen.dart';
 import '../features/technical/domain/entities/fiber_event.dart';
 
 class AppRoutes {
+  static const String splash = '/';
   static const String login = '/login';
   static const String forgotPassword = '/forgot-password';
   static const String changePassword = '/change-password';
@@ -34,6 +36,7 @@ class AppRoutes {
   static const String mapaGeneral = '/mapa-general';
 
   static Map<String, WidgetBuilder> get routes => {
+    splash: (context) => const SplashScreen(),
     login: (context) => const LoginScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
     changePassword: (context) => const ChangePasswordScreen(),

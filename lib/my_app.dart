@@ -1,10 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -39,7 +36,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.dark,
             ),
           ),
-          initialRoute: AppRoutes.login,
+          initialRoute: AppRoutes.splash,
           routes: AppRoutes.routes,
         );
       },

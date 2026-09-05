@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
-import '../../../../core/widgets/user_avatar.dart';
-import '../../../../core/widgets/connectivity_badge.dart';
+import '../../../../core/widgets/app_header_actions.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/home_provider.dart';
 import '../providers/notifications_provider.dart';
@@ -107,7 +106,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         final unreadCount = provider.notifications.where((n) => !n.isRead).length;
 
         return AppScaffold(
-          isScrollable: false, // FIJO: Evita el error de "Vertical viewport was given unbounded height"
+          isScrollable: false, 
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(64),
             child: Container(
@@ -146,42 +145,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ],
                       ),
                     ),
-                    const ConnectivityBadge(),
-                    const SizedBox(width: 12),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/ic_bell.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter: const ColorFilter.mode(AppColors.textPrimary, BlendMode.srcIn),
-                        ),
-                        if (homeProvider.unreadCount > 0)
-                          Positioned(
-                            top: -2,
-                            right: -2,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                color: AppColors.statusRed,
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-                              child: Text(
-                                '${homeProvider.unreadCount}',
-                                style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(width: 12),
-                    UserAvatar(
-                      imageUrl: user?.profilePhotoUrl,
-                      size: 32,
-                      showStatusDot: true,
+                    AppHeaderActions(
+                      isOnline: true,
+                      notificationCount: homeProvider.unreadCount,
+                      userImageUrl: user?.profilePhotoUrl,
+                      onNotificationTap: () {},
+                      onAvatarTap: () => Navigator.pushNamed(context, AppRoutes.perfil),
                     ),
                   ],
                 ),
@@ -194,7 +163,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           body: RefreshIndicator(
             onRefresh: provider.loadNotifications,
             child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(), // Necesario para que RefreshIndicator funcione con listas cortas
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(bottom: 32),
               children: [
                 const SizedBox(height: 16),
