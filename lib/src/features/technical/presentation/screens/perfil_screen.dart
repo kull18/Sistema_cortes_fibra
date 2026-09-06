@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
 import 'package:sistema_cortes_fibra/src/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sistema_cortes_fibra/src/features/technical/presentation/providers/home_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_info_card.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_setting_section.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/logout_button.dart';
@@ -59,6 +60,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final homeProvider = context.watch<HomeProvider>();
     final user = authProvider.user;
 
     return AppScaffold(
@@ -66,9 +68,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
       onTabSelected: _onTabSelected,
       appBar: AppTopBar(
         appTitle: 'Perfil Técnico',
-        notificationCount: 2,
-        avatarUrl: user?.profilePhotoUrl, // Vinculado el avatar del TopBar
-        onNotificationTap: () {},
+        notificationCount: homeProvider.unreadCount,
+        avatarUrl: user?.profilePhotoUrl,
+        onNotificationTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
         onAvatarTap: () {},
       ),
       body: SingleChildScrollView(
@@ -78,7 +80,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
             UserHeader(
               name: user?.fullName ?? 'Técnico SCF',
               id: user?.technicianCode ?? 'FT-0000',
-              imageUrl: user?.profilePhotoUrl, // Vinculada la imagen real del perfil
+              imageUrl: user?.profilePhotoUrl,
             ),
             const SizedBox(height: 24),
             

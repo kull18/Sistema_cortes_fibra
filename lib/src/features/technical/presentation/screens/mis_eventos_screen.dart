@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/home_provider.dart';
 import '../../domain/entities/fiber_event.dart';
 import '../widgets/detailed_event_card.dart';
 import '../widgets/incidencias_summary_card.dart';
@@ -15,7 +19,6 @@ class MisEventosScreen extends StatefulWidget {
 }
 
 class _MisEventosScreenState extends State<MisEventosScreen> {
-  // Datos locales filtrados por el usuario (en este caso dummy)
   final List<FiberEvent> _misEventos = const [
     FiberEvent(
       id: 'INC-2025-0094',
@@ -65,8 +68,12 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final homeProvider = context.watch<HomeProvider>();
+    final user = authProvider.user;
+
     return AppScaffold(
-      currentTab: AppTab.eventos, // Resaltamos la pestaña de eventos ya que es contenido relacionado
+      currentTab: AppTab.eventos,
       onTabSelected: _onTabSelected,
       showDivider: true,
       padding: EdgeInsets.zero,
@@ -74,9 +81,10 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
       appBar: DetailTopBar(
         title: 'Mis Publicaciones',
         subtitle: 'Eventos reportados por ti',
-        notificationCount: 2,
-        onNotificationTap: () => Navigator.of(context).pushNamed('/notifications'),
-        onAvatarTap: () => Navigator.of(context).pushReplacementNamed('/perfil'),
+        notificationCount: homeProvider.unreadCount,
+        avatarUrl: user?.profilePhotoUrl,
+        onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+        onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
       ),
       body: Column(
         children: [

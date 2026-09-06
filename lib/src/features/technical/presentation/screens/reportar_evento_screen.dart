@@ -11,6 +11,8 @@ import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/preferences/user_preferences.dart';
 import '../../../../core/location/location_service.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/home_provider.dart';
 import '../../../technical/domain/entities/location_mode.dart';
 import '../../../technical/domain/entities/photo_evidence.dart';
 import '../widgets/reportar_hero_banner.dart';
@@ -187,6 +189,9 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
   Widget build(BuildContext context) {
     final officeProvider = context.watch<CentralOfficeProvider>();
     final reportProvider = context.watch<ReportEventProvider>();
+    final authProvider = context.watch<AuthProvider>();
+    final homeProvider = context.watch<HomeProvider>();
+    final user = authProvider.user;
 
     final centrales = officeProvider.offices.map((e) => Central.fromEntity(e)).toList();
 
@@ -206,9 +211,10 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
       },
       appBar: DetailTopBar(
         title: 'Reporte de Evento',
-        notificationCount: 0,
-        onNotificationTap: () {},
-        onAvatarTap: () {},
+        notificationCount: homeProvider.unreadCount,
+        avatarUrl: user?.profilePhotoUrl,
+        onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+        onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
       ),
       body: SingleChildScrollView(
         child: Column(

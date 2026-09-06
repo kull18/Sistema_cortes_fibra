@@ -6,6 +6,7 @@ import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/home_provider.dart';
 import '../providers/central_office_provider.dart';
 import '../../domain/entities/fiber_event.dart';
@@ -90,8 +91,10 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
   Widget build(BuildContext context) {
     final homeProvider = context.watch<HomeProvider>();
     final officeProvider = context.watch<CentralOfficeProvider>();
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+    
     final activeCuts = homeProvider.events.where((e) => e.status == FiberEventStatus.activo).toList();
-
     final currentSelection = _selectedEvent ?? (activeCuts.isNotEmpty ? activeCuts.first : null);
 
     return AppScaffold(
@@ -101,6 +104,7 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
         title: 'Mapa General',
         subtitle: 'Centrales y Eventos Activos',
         notificationCount: homeProvider.unreadCount,
+        avatarUrl: user?.profilePhotoUrl,
         onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
         onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
       ),

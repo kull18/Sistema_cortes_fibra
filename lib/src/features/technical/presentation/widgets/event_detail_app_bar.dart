@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
-import '../../../../core/widgets/user_avatar.dart';
+import '../../../../core/widgets/app_header_actions.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/home_provider.dart';
 
 class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String folio;
@@ -18,6 +20,10 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final homeProvider = context.watch<HomeProvider>();
+    final user = authProvider.user;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: AppColors.background,
@@ -39,7 +45,7 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
                   const Text(
                     'Detalle de Evento',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
@@ -54,48 +60,12 @@ class EventDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceMuted,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.keyboard_arrow_down, size: 20, color: AppColors.textSecondary),
-            ),
-            const SizedBox(width: 12),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/ic_bell.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: const ColorFilter.mode(AppColors.textPrimary, BlendMode.srcIn),
-                ),
-                Positioned(
-                  top: -2,
-                  right: -2,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: AppColors.statusRed,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-                    child: const Text(
-                      '2',
-                      style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            const UserAvatar(
-              imageUrl: null, // Usa el fallback por defecto
-              size: 32,
-              showStatusDot: true,
+            AppHeaderActions(
+              isOnline: true,
+              notificationCount: homeProvider.unreadCount,
+              userImageUrl: user?.profilePhotoUrl,
+              onNotificationTap: () => Navigator.pushNamed(context, '/notifications'),
+              onAvatarTap: () => Navigator.pushNamed(context, '/perfil'),
             ),
           ],
         ),

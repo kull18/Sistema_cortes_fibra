@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../app_colors.dart';
-import 'connectivity_badge.dart';
-import 'notification_bell.dart';
-import 'user_avatar.dart';
+import 'app_header_actions.dart';
 
 /// Header compartido por todas las screens autenticadas del área técnica.
-/// Contiene: logo + nombre de app, badge de conectividad, notificaciones y avatar.
+/// Contiene: logo + nombre de app y las acciones globales (Wifi, Notif, Perfil).
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String appTitle;
   final String? subtitle;
@@ -83,16 +81,12 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
             ),
-            ConnectivityBadge(isOnline: isOnline),
-            const SizedBox(width: 12),
-            NotificationBell(
-              count: notificationCount,
-              onTap: onNotificationTap,
-            ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: onAvatarTap,
-              child: UserAvatar(imageUrl: avatarUrl, size: 32),
+            AppHeaderActions(
+              isOnline: isOnline,
+              notificationCount: notificationCount,
+              userImageUrl: avatarUrl,
+              onNotificationTap: onNotificationTap,
+              onAvatarTap: onAvatarTap,
             ),
           ],
         ),
