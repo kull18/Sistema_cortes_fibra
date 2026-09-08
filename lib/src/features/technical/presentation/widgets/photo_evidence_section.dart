@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/numbered_section_card.dart';
-import '../../models/photo_evidence.dart';
+import '../../domain/entities/photo_evidence.dart';
 import 'photo_evidence_tile.dart';
 
 class PhotoEvidenceSection extends StatelessWidget {
@@ -65,18 +65,21 @@ class PhotoEvidenceSection extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             )
-          : Column(
-              children: evidences
-                  .map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: PhotoEvidenceTile(
-                        evidence: e,
-                        onDelete: () => onDelete(e),
+          : Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Column(
+                children: evidences
+                    .map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: PhotoEvidenceTile(
+                          evidence: e,
+                          onDelete: () => onDelete(e),
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
     );
   }

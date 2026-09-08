@@ -6,57 +6,81 @@ class QuickAccessSection extends StatelessWidget {
   final VoidCallback onMapaGeneral;
   final VoidCallback onCentrales;
   final VoidCallback onHistorial;
+  final VoidCallback onMisPublicaciones;
+  final bool showCentrales;
 
   const QuickAccessSection({
     super.key,
     required this.onMapaGeneral,
     required this.onCentrales,
     required this.onHistorial,
+    required this.onMisPublicaciones,
+    this.showCentrales = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'ACCESOS RÁPIDOS',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-            color: AppColors.textSecondary,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'ACCESOS RÁPIDOS',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: AppColors.textSecondary,
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: QuickAccessButton(
-                iconPath: 'assets/icons/mapa.svg',
-                label: 'Mapa General',
-                onTap: onMapaGeneral,
+          const SizedBox(height: 12),
+          // Primera Fila
+          Row(
+            children: [
+              Expanded(
+                child: QuickAccessButton(
+                  iconPath: 'assets/icons/ic_map.svg',
+                  label: 'Mapa General',
+                  onTap: onMapaGeneral,
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: QuickAccessButton(
-                iconPath: 'assets/icons/brujula.svg',
-                label: 'Centrales',
-                onTap: onCentrales,
+              // Solo mostramos el separador y el segundo botón si showCentrales es true
+              if (showCentrales) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: QuickAccessButton(
+                    iconPath: 'assets/icons/ic_building.svg',
+                    label: 'Centrales',
+                    onTap: onCentrales,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Segunda Fila
+          Row(
+            children: [
+              Expanded(
+                child: QuickAccessButton(
+                  iconPath: 'assets/icons/ic_file.svg',
+                  label: 'Historial',
+                  onTap: onHistorial,
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: QuickAccessButton(
-                iconPath: 'assets/icons/archivo.svg',
-                label: 'Historial',
-                onTap: onHistorial,
+              const SizedBox(width: 10),
+              Expanded(
+                child: QuickAccessButton(
+                  iconPath: 'assets/icons/ic_user.svg',
+                  label: 'Mis Reportes',
+                  onTap: onMisPublicaciones,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

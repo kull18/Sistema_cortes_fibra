@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/fiber_event.dart';
+import '../../../technical/domain/entities/fiber_event.dart';
 
 class EventStatusChip extends StatelessWidget {
   final FiberEventStatus status;
@@ -13,9 +13,9 @@ class EventStatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: config.color.withOpacity(0.15),
+        color: config.color.withOpacity(0.1),
         border: Border.all(color: config.color.withOpacity(0.3)),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -23,10 +23,10 @@ class EventStatusChip extends StatelessWidget {
           Icon(config.icon, size: 12, color: config.color),
           const SizedBox(width: 4),
           Text(
-            config.label,
+            config.label.toUpperCase(),
             style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
               color: config.color,
             ),
           ),
@@ -40,7 +40,9 @@ class EventStatusChip extends StatelessWidget {
       case FiberEventStatus.activo:
         return _StatusConfig('Activo', AppColors.statusRed, Icons.sensors);
       case FiberEventStatus.atendido:
-        return _StatusConfig('Atendido', AppColors.statusGreen, Icons.build_outlined);
+        return _StatusConfig('Atendido', AppColors.statusGreen, Icons.check_circle_outline);
+      case FiberEventStatus.cerrado:
+        return _StatusConfig('Cerrado', AppColors.textSecondary, Icons.lock_outline);
       case FiberEventStatus.pendiente:
         return _StatusConfig('Pendiente', AppColors.statusAmber, Icons.schedule);
     }

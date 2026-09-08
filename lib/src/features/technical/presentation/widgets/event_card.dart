@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/app_colors.dart';
-import '../../models/fiber_event.dart';
+import '../../domain/entities/fiber_event.dart';
 import 'event_status_chip.dart';
 
 class EventCard extends StatelessWidget {
@@ -20,6 +20,8 @@ class EventCard extends StatelessWidget {
         return AppColors.statusRed;
       case FiberEventStatus.atendido:
         return AppColors.statusGreen;
+      case FiberEventStatus.cerrado:
+        return AppColors.textSecondary;
       case FiberEventStatus.pendiente:
         return AppColors.statusAmber;
     }
@@ -46,7 +48,6 @@ class EventCard extends StatelessWidget {
               Text(
                 event.id,
                 style: const TextStyle(
-                  fontFamily: 'JetBrainsMono',
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryBlue,
@@ -57,19 +58,10 @@ class EventCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            event.title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
           Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/brujula.svg',
+                'assets/icons/ic_compass.svg',
                 width: 14,
                 height: 14,
                 colorFilter: const ColorFilter.mode(
@@ -78,21 +70,21 @@ class EventCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
-                'Tramo ${event.originPrefix} \u2192 ${event.destinationPrefix}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryBlue,
+              Flexible(
+                child: Text(
+                  'Tramo ${event.originPrefix} \u2192 ${event.destinationPrefix}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryBlue,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  '(${event.kmReference})',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Text(
+                '(${event.kmReference})',
+                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -101,28 +93,39 @@ class EventCard extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.surfaceMuted,
-              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
+              border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SvgPicture.asset(
-                      'assets/icons/ubicacion.svg',
-                      width: 14,
-                      height: 14,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primaryBlue,
-                        BlendMode.srcIn,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: SvgPicture.asset(
+                        'assets/icons/ic_file.svg',
+                        width: 14,
+                        height: 14,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.primaryBlue,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        event.location,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        event.description.isNotEmpty ? event.description : 'Sin descripción',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -136,7 +139,7 @@ class EventCard extends StatelessWidget {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/reloj.svg',
+                        'assets/icons/ic_clock.svg',
                         width: 12,
                         height: 12,
                         colorFilter: const ColorFilter.mode(
@@ -159,9 +162,12 @@ class EventCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Tocar para abrir diagnóstico',
-                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              const Expanded(
+                child: Text(
+                  'Tocar para abrir diagnóstico',
+                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               GestureDetector(
                 onTap: onVerDetalle,
@@ -178,7 +184,7 @@ class EventCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     SvgPicture.asset(
-                      'assets/icons/flecha.svg',
+                      'assets/icons/ic_arrow_right.svg',
                       width: 14,
                       height: 14,
                       colorFilter: const ColorFilter.mode(

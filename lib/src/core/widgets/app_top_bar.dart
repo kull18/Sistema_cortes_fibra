@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../app_colors.dart';
-import 'connectivity_badge.dart';
-import 'notification_bell.dart';
-import 'user_avatar.dart';
+import 'app_header_actions.dart';
 
 /// Header compartido por todas las screens autenticadas del área técnica.
-/// Contiene: logo + nombre de app, badge de conectividad, notificaciones y avatar.
+/// Contiene: logo + nombre de app y las acciones globales (Wifi, Notif, Perfil).
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String appTitle;
+  final String? subtitle;
   final bool isOnline;
   final int notificationCount;
   final String? avatarUrl;
@@ -18,6 +17,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   const AppTopBar({
     super.key,
     this.appTitle = 'FiberTech Ops',
+    this.subtitle,
     this.isOnline = true,
     this.notificationCount = 0,
     this.avatarUrl,
@@ -30,8 +30,6 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Usamos SafeArea aquí para asegurar que el contenido no choque con el notch
-    // independientemente de cómo se use este widget.
     return SafeArea(
       bottom: false,
       child: Container(
@@ -60,25 +58,35 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                appTitle,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    appTitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                ],
               ),
             ),
-            ConnectivityBadge(isOnline: isOnline),
-            const SizedBox(width: 12),
-            NotificationBell(
-              count: notificationCount,
-              onTap: onNotificationTap,
-            ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: onAvatarTap,
-              child: UserAvatar(imageUrl: avatarUrl, size: 32),
+            AppHeaderActions(
+              isOnline: isOnline,
+              notificationCount: notificationCount,
+              userImageUrl: avatarUrl,
+              onNotificationTap: onNotificationTap,
+              onAvatarTap: onAvatarTap,
             ),
           ],
         ),

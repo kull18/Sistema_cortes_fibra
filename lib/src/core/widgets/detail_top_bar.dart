@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../app_colors.dart';
-import 'connectivity_badge.dart';
-import 'notification_bell.dart';
-import 'user_avatar.dart';
+import 'app_header_actions.dart';
 
 /// Header con botón de regreso + título, compartido por todas las screens
 /// de detalle/formulario (Reportar, Ubicación, Confirmar, Detalle de Evento...).
@@ -44,7 +42,7 @@ class DetailTopBar extends StatelessWidget implements PreferredSizeWidget {
           IconButton(
             onPressed: onBack ?? () => Navigator.of(context).maybePop(),
             icon: SvgPicture.asset(
-              'assets/icons/ac_arrow_left.svg',
+              'assets/icons/ic_arrow_left.svg',
               width: 24,
               height: 24,
               colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
@@ -78,13 +76,12 @@ class DetailTopBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           if (actions != null) ...actions!,
           const SizedBox(width: 8),
-          ConnectivityBadge(isOnline: isOnline),
-          const SizedBox(width: 12),
-          NotificationBell(count: notificationCount, onTap: onNotificationTap),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: onAvatarTap,
-            child: UserAvatar(imageUrl: avatarUrl, size: 32),
+          AppHeaderActions(
+            isOnline: isOnline,
+            notificationCount: notificationCount,
+            userImageUrl: avatarUrl,
+            onNotificationTap: onNotificationTap,
+            onAvatarTap: onAvatarTap,
           ),
           const SizedBox(width: 4),
         ],

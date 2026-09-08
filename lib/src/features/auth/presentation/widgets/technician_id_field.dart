@@ -46,7 +46,7 @@ class TechnicianIdField extends StatelessWidget {
           child: Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/persona.svg',
+                'assets/icons/ic_user.svg',
                 width: 18,
                 height: 18,
                 colorFilter: const ColorFilter.mode(
