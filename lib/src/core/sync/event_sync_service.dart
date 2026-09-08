@@ -141,13 +141,16 @@ class EventSyncService {
   }
 
   Future<void> _uploadFileToS3(String uploadUrl, File file) async {
+    final bytes = await file.readAsBytes();
     final response = await http.put(
       Uri.parse(uploadUrl),
-      body: await file.readAsBytes(),
-      headers: {'Content-Type': 'image/jpeg'},
+      body: bytes,
+      headers: {
+        'Content-Length': bytes.length.toString(),
+      },
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(
         statusCode: response.statusCode,
         message: 'Error al subir imagen a S3',

@@ -349,7 +349,50 @@ class _CentralesScreenState extends State<CentralesScreen> {
                   ),
                 ),
               ),
-              const Icon(Icons.more_vert, color: AppColors.textSecondary),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+                onSelected: (value) {
+                  if (value == 'ficha') {
+                    Navigator.of(context).pushNamed(AppRoutes.fichaCentral, arguments: office);
+                  } else if (value == 'mapa') {
+                    Navigator.of(context).pushNamed(AppRoutes.verMapaCentral, arguments: office);
+                  } else if (value == 'delete') {
+                    _deleteOffice(office);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'ficha',
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 18, color: AppColors.primaryBlue),
+                        SizedBox(width: 8),
+                        Text('Ver Ficha'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'mapa',
+                    child: Row(
+                      children: [
+                        Icon(Icons.map_outlined, size: 18, color: AppColors.primaryBlue),
+                        SizedBox(width: 8),
+                        Text('Ver en Mapa'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Eliminar Central', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -408,7 +451,12 @@ class _CentralesScreenState extends State<CentralesScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.fichaCentral,
+                      arguments: office,
+                    );
+                  },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3)),
@@ -439,7 +487,12 @@ class _CentralesScreenState extends State<CentralesScreen> {
                     color: const Color(0xFFF1F5F9),
                   ),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.verMapaCentral,
+                        arguments: office,
+                      );
+                    },
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

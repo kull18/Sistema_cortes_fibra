@@ -34,10 +34,12 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
   });
 
   @override
-  Future<List<FiberEvent>> getEvents({String? status}) async {
+  Future<List<FiberEvent>> getEvents({String? status, String? reportedBy}) async {
     try {
-      final models = await remoteDataSource.getEvents(status: status);
-      await eventLocalDao.replaceAll(models.map((m) => m.toJson()).toList());
+      final models = await remoteDataSource.getEvents(status: status, reportedBy: reportedBy);
+      if (reportedBy == null) {
+        await eventLocalDao.replaceAll(models.map((m) => m.toJson()).toList());
+      }
       return models.map((model) => TechnicalMapper.toFiberEventEntity(model)).toList();
     } on NetworkException {
       final cached = await eventLocalDao.getCachedEvents(status: status);
@@ -277,13 +279,16 @@ class TechnicalRepositoryImpl implements TechnicalRepository {
   }
 
   Future<void> uploadFileToS3(String uploadUrl, File file) async {
+    final bytes = await file.readAsBytes();
     final response = await http.put(
       Uri.parse(uploadUrl),
-      body: await file.readAsBytes(),
-      headers: {'Content-Type': 'image/jpeg'},
+      body: bytes,
+      headers: {
+        'Content-Length': bytes.length.toString(),
+      },
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(
         statusCode: response.statusCode,
         message: 'Error al subir imagen a S3',

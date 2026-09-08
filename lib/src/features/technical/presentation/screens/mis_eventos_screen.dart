@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -7,9 +8,11 @@ import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/home_provider.dart';
+import '../providers/mis_eventos_provider.dart';
 import '../../domain/entities/fiber_event.dart';
 import '../widgets/detailed_event_card.dart';
 import '../widgets/incidencias_summary_card.dart';
+import '../widgets/event_filter_chips.dart';
 
 class MisEventosScreen extends StatefulWidget {
   const MisEventosScreen({super.key});
@@ -19,50 +22,57 @@ class MisEventosScreen extends StatefulWidget {
 }
 
 class _MisEventosScreenState extends State<MisEventosScreen> {
-  final List<FiberEvent> _misEventos = const [
-    FiberEvent(
-      id: 'INC-2025-0094',
-      title: 'Corte Total de Fibra Óptica',
-      description: 'Ruptura física de cable por excavación de terceros en tramo de transporte.',
-      originPrefix: 'TGZ-01',
-      destinationPrefix: 'SCH-02',
-      kmReference: 'Km 14.2',
-      location: 'Cañón del Sumidero',
-      timeLabel: 'Hace 25 min',
-      reporterName: 'Carlos Mendoza',
-      status: FiberEventStatus.activo,
-    ),
-    FiberEvent(
-      id: 'INC-2025-0084',
-      title: 'Reparación de Tramo en Poste #142',
-      description: 'Fusión finalizada correctamente. Señal de potencia restablecida a -18.4 dBm.',
-      originPrefix: 'TGZ-01',
-      destinationPrefix: 'SCL-01',
-      kmReference: 'Km 41.5',
-      location: 'San Fernando',
-      timeLabel: 'Ayer, 18:30 hrs',
-      reporterName: 'Carlos Mendoza',
-      status: FiberEventStatus.cerrado,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MisEventosProvider>().fetchMyEvents();
+    });
+  }
 
   void _onTabSelected(AppTab tab) {
     switch (tab) {
       case AppTab.inicio:
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         break;
       case AppTab.centrales:
-        Navigator.of(context).pushReplacementNamed('/centrales');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
         break;
       case AppTab.reportar:
-        Navigator.of(context).pushNamed('/reportar-evento');
+        Navigator.of(context).pushNamed(AppRoutes.reportarEvento);
         break;
       case AppTab.eventos:
-        Navigator.of(context).pushReplacementNamed('/eventos');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
         break;
       case AppTab.perfil:
-        Navigator.of(context).pushReplacementNamed('/perfil');
+        Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
         break;
+    }
+  }
+
+  Future<void> _handleMarcarAtendido(FiberEvent event) async {
+    final eventId = event.rawId ?? int.tryParse(event.id.split('-').last);
+    if (eventId == null) return;
+
+    final provider = context.read<MisEventosProvider>();
+    final success = await provider.markAsResolved(eventId);
+
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Evento marcado como Atendido'),
+            backgroundColor: AppColors.statusGreen,
+          ),
+        );
+      } else if (provider.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(provider.errorMessage!),
+            backgroundColor: AppColors.statusRed,
+          ),
+        );
+      }
     }
   }
 
@@ -72,32 +82,61 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
     final homeProvider = context.watch<HomeProvider>();
     final user = authProvider.user;
 
-    return AppScaffold(
-      currentTab: AppTab.eventos,
-      onTabSelected: _onTabSelected,
-      showDivider: true,
-      padding: EdgeInsets.zero,
-      isScrollable: false,
-      appBar: DetailTopBar(
-        title: 'Mis Publicaciones',
-        subtitle: 'Eventos reportados por ti',
-        notificationCount: homeProvider.unreadCount,
-        avatarUrl: user?.profilePhotoUrl,
-        onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
-        onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
-      ),
-      body: Column(
-        children: [
-          Expanded(
+    return Consumer<MisEventosProvider>(
+      builder: (context, provider, child) {
+        final showSkeleton = provider.isLoading && provider.events.isEmpty;
+        final events = provider.events;
+
+        final activosCount = showSkeleton ? 0 : events.where((e) => e.status == FiberEventStatus.activo).length;
+        final cerradosCount = showSkeleton ? 0 : events.where((e) => e.status == FiberEventStatus.cerrado || e.status == FiberEventStatus.atendido).length;
+
+        return AppScaffold(
+          currentTab: AppTab.eventos,
+          onTabSelected: _onTabSelected,
+          showDivider: true,
+          padding: EdgeInsets.zero,
+          isScrollable: false,
+          appBar: DetailTopBar(
+            title: 'Mis Publicaciones',
+            subtitle: 'Eventos reportados por ti',
+            notificationCount: homeProvider.unreadCount,
+            avatarUrl: user?.profilePhotoUrl,
+            onNotificationTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+            onAvatarTap: () => Navigator.of(context).pushReplacementNamed(AppRoutes.perfil),
+          ),
+          body: RefreshIndicator(
+            onRefresh: () => provider.fetchMyEvents(),
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
               children: [
-                IncidenciasSummaryCard(
-                  total: _misEventos.length,
-                  activos: _misEventos.where((e) => e.status == FiberEventStatus.activo).length,
-                  cerrados: _misEventos.where((e) => e.status == FiberEventStatus.cerrado).length,
+                Skeletonizer(
+                  enabled: showSkeleton,
+                  child: IncidenciasSummaryCard(
+                    total: events.length,
+                    activos: activosCount,
+                    cerrados: cerradosCount,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+
+                // Filtros
+                Row(
+                  children: [
+                    const Text(
+                      'Estado:',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: EventFilterChips(
+                        selected: provider.selectedFilter,
+                        onChanged: (filter) => provider.setFilter(filter),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -117,7 +156,7 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${_misEventos.length} Reportes',
+                        '${events.length} Reportes',
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w900,
@@ -128,23 +167,42 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (_misEventos.isEmpty)
+
+                if (provider.errorMessage != null && provider.events.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Text(
+                        provider.errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: AppColors.statusRed),
+                      ),
+                    ),
+                  )
+                else if (events.isEmpty && !showSkeleton)
                   _buildEmptyState()
                 else
-                  ..._misEventos.map((event) => Padding(
+                  Skeletonizer(
+                    enabled: showSkeleton,
+                    child: Column(
+                      children: events.map((event) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: DetailedEventCard(
                           event: event,
+                          showMarcarAtendido: true,
+                          onMarcarAtendido: () => _handleMarcarAtendido(event),
                           onVerDetalle: () {
-                            Navigator.of(context).pushNamed('/event-detail', arguments: event);
+                            Navigator.of(context).pushNamed(AppRoutes.eventDetail, arguments: event);
                           },
                         ),
-                      )),
+                      )).toList(),
+                    ),
+                  ),
               ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

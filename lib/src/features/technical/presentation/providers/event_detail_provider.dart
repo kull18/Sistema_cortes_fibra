@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/api/api_exception.dart';
 import '../../domain/entities/fiber_event.dart';
 import '../../domain/entities/technical_comment.dart';
 import '../../domain/usecases/get_event_usecase.dart';
 import '../../domain/usecases/update_event_usecase.dart';
-import '../../domain/usecases/list_event_photos_usecase.dart';
 import '../../domain/usecases/list_event_comments_usecase.dart';
 import '../../domain/usecases/create_event_comment_usecase.dart';
 import '../../domain/usecases/delete_event_comment_usecase.dart';
@@ -11,7 +11,6 @@ import '../../domain/usecases/delete_event_comment_usecase.dart';
 class EventDetailProvider extends ChangeNotifier {
   final GetEventUseCase getEventUseCase;
   final UpdateEventUseCase updateEventUseCase;
-  final ListEventPhotosUseCase listEventPhotosUseCase;
   final ListEventCommentsUseCase listEventCommentsUseCase;
   final CreateEventCommentUseCase createEventCommentUseCase;
   final DeleteEventCommentUseCase deleteEventCommentUseCase;
@@ -19,7 +18,6 @@ class EventDetailProvider extends ChangeNotifier {
   EventDetailProvider({
     required this.getEventUseCase,
     required this.updateEventUseCase,
-    required this.listEventPhotosUseCase,
     required this.listEventCommentsUseCase,
     required this.createEventCommentUseCase,
     required this.deleteEventCommentUseCase,
@@ -51,27 +49,41 @@ class EventDetailProvider extends ChangeNotifier {
     try {
       final results = await Future.wait([
         getEventUseCase.execute(eventId),
-        listEventPhotosUseCase.execute(eventId),
         listEventCommentsUseCase.execute(eventId),
       ]);
 
       _event = results[0] as FiberEvent;
-      _photos = results[1] as List<Map<String, dynamic>>;
-      
-      final rawComments = results[2] as List<Map<String, dynamic>>;
+      _photos = _event?.photos ?? [];
+      print('event.photos.length: ${_photos.length}');
+
+      final rawComments = results[1] as List<Map<String, dynamic>>;
       _comments = rawComments.map((c) {
-        final author = c['author'] as Map<String, dynamic>;
+        final author = c['author'] as Map<String, dynamic>? ?? {};
+        final fullName = author['full_name'] as String?;
+        final techCode = author['technician_code'] as String?;
+        final profilePhotoUrl = author['profile_photo_url'] as String?;
         final createdAt = DateTime.parse(c['created_at']);
+
+        final displayName = (fullName != null && fullName.trim().isNotEmpty)
+            ? fullName
+            : (techCode != null && techCode.trim().isNotEmpty ? techCode : 'Técnico');
+
         return TechnicalComment(
-          userName: author['full_name'],
-          userRole: 'Técnico', // Podrías expandir esto si el backend lo da
-          userAvatar: '',
+          userName: displayName,
+          userRole: 'Técnico',
+          userAvatar: profilePhotoUrl,
           timeAgo: _formatTimeLabel(createdAt),
           exactTime: '${createdAt.hour}:${createdAt.minute.toString().padLeft(2, '0')}',
-          content: c['content'],
+          content: c['content'] ?? '',
         );
       }).toList();
 
+    } on ApiException catch (e) {
+      if (e.statusCode == 401) {
+        _error = 'Inicia sesión para ver este evento';
+      } else {
+        _error = e.message;
+      }
     } catch (e) {
       _error = e.toString();
     } finally {

@@ -6,22 +6,18 @@ import '../../../../core/app_colors.dart';
 class BuildSettingSection extends StatelessWidget {
   final bool notificaciones;
   final bool sincronizacion;
-  final bool gpsAltaPrecision;
   final bool modoOscuro;
   final ValueChanged<bool> onNotificacionesChanged;
   final ValueChanged<bool> onSincronizacionChanged;
-  final ValueChanged<bool> onGpsAltaPrecisionChanged;
   final ValueChanged<bool> onModoOscuroChanged;
 
   const BuildSettingSection({
     super.key,
     required this.notificaciones,
     required this.sincronizacion,
-    required this.gpsAltaPrecision,
     required this.modoOscuro,
     required this.onNotificacionesChanged,
     required this.onSincronizacionChanged,
-    required this.onGpsAltaPrecisionChanged,
     required this.onModoOscuroChanged,
   });
 
@@ -91,14 +87,6 @@ class BuildSettingSection extends StatelessWidget {
                   subtitle: 'Cargar reportes al recuperar cobertura móvil.',
                   value: sincronizacion,
                   onChanged: onSincronizacionChanged,
-                ),
-                const SizedBox(height: 12),
-                BuildSettingTitle(
-                  icon: 'ic_locate_fixed.svg',
-                  title: 'GPS de Alta Precisión',
-                  subtitle: 'Uso continuo de GPS para fijar coordenadas de falla.',
-                  value: gpsAltaPrecision,
-                  onChanged: onGpsAltaPrecisionChanged,
                 ),
                 const SizedBox(height: 12),
                 BuildSettingTitle(

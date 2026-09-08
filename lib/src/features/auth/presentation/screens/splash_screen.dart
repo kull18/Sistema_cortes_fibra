@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
+import 'package:sistema_cortes_fibra/src/core/responsive/responsive_extensions.dart';
 import 'package:sistema_cortes_fibra/src/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/screens/home_screen.dart';
@@ -18,9 +19,15 @@ class SplashScreen extends StatelessWidget {
         ? const HomeScreen()
         : const LoginScreen();
 
+    final splashIconSize = context.responsiveValue<double>(
+      small: 260.0,
+      medium: 310.0,
+      large: 340.0,
+    );
+
     return AnimatedSplashScreen(
       duration: 2600,
-      splashIconSize: 320,
+      splashIconSize: splashIconSize,
       splash: const _SplashContent(),
       nextScreen: nextScreen,
       splashTransition: SplashTransition.fadeTransition,
@@ -135,6 +142,23 @@ class _SplashContentState extends State<_SplashContent>
 
   @override
   Widget build(BuildContext context) {
+    final iconPadding = context.responsiveValue<double>(
+      small: 16.0,
+      medium: 24.0,
+    );
+    final iconSize = context.responsiveValue<double>(
+      small: 60.0,
+      medium: 80.0,
+    );
+    final spacingHeight = context.responsiveValue<double>(
+      small: 20.0,
+      medium: 32.0,
+    );
+    final titleFontSize = context.responsiveValue<double>(
+      small: 22.0,
+      medium: 28.0,
+    );
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -153,13 +177,13 @@ class _SplashContentState extends State<_SplashContent>
             );
           },
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(iconPadding),
             decoration: BoxDecoration(
               color: AppColors.primaryBlueSoft,
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryBlue.withOpacity(0.25),
+                  color: AppColors.primaryBlue.withValues(alpha: 0.25),
                   blurRadius: 24,
                   spreadRadius: 2,
                 ),
@@ -167,7 +191,7 @@ class _SplashContentState extends State<_SplashContent>
             ),
             child: SvgPicture.asset(
               'assets/icons/ic_network_node.svg',
-              width: 80,
+              width: iconSize,
               colorFilter: const ColorFilter.mode(
                 AppColors.primaryBlue,
                 BlendMode.srcIn,
@@ -175,16 +199,16 @@ class _SplashContentState extends State<_SplashContent>
             ),
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: spacingHeight),
 
         SlideTransition(
           position: _titleSlide,
           child: FadeTransition(
             opacity: _titleOpacity,
-            child: const Text(
+            child: Text(
               'FiberTech Ops',
               style: TextStyle(
-                fontSize: 28,
+                fontSize: titleFontSize,
                 fontWeight: FontWeight.w900,
                 color: AppColors.primaryBlue,
                 letterSpacing: -1.0,
@@ -203,13 +227,13 @@ class _SplashContentState extends State<_SplashContent>
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textSecondary.withOpacity(0.6),
+                color: AppColors.textSecondary.withValues(alpha: 0.6),
                 letterSpacing: 2.0,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
 
         FadeTransition(
           opacity: _dotsOpacity,
@@ -220,7 +244,7 @@ class _SplashContentState extends State<_SplashContent>
   }
 }
 
-/// Tres puntos con animacion de rebote secuencial, simulando "cargando".
+/// Tres puntos con animación de rebote secuencial, simulando "cargando".
 class _LoadingDots extends StatefulWidget {
   const _LoadingDots();
 
@@ -269,7 +293,7 @@ class _LoadingDotsState extends State<_LoadingDots>
                   width: 6,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryBlue.withOpacity(0.4 + bounce * 0.6),
+                    color: AppColors.primaryBlue.withValues(alpha: 0.4 + bounce * 0.6),
                     shape: BoxShape.circle,
                   ),
                 ),

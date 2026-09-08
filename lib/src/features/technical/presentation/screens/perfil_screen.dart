@@ -24,7 +24,6 @@ class PerfilScreen extends StatefulWidget {
 class _PerfilScreenState extends State<PerfilScreen> {
   late bool _notificaciones;
   late bool _sincronizacion;
-  late bool _gpsAltaPrecision;
   late bool _modoOscuro;
 
   @override
@@ -32,7 +31,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
     super.initState();
     _notificaciones = AppPreferences.notificationsEnabled;
     _sincronizacion = AppPreferences.offlineSyncEnabled;
-    _gpsAltaPrecision = AppPreferences.highPrecisionGpsEnabled;
     _modoOscuro = AppPreferences.darkModeEnabled;
   }
 
@@ -97,7 +95,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             BuildSettingSection(
               notificaciones: _notificaciones,
               sincronizacion: _sincronizacion,
-              gpsAltaPrecision: _gpsAltaPrecision,
               modoOscuro: _modoOscuro,
               onNotificacionesChanged: (v) async {
                 await AppPreferences.setNotificationsEnabled(v);
@@ -106,10 +103,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
               onSincronizacionChanged: (v) async {
                 await AppPreferences.setOfflineSyncEnabled(v);
                 setState(() => _sincronizacion = v);
-              },
-              onGpsAltaPrecisionChanged: (v) async {
-                await AppPreferences.setHighPrecisionGpsEnabled(v);
-                setState(() => _gpsAltaPrecision = v);
               },
               onModoOscuroChanged: (v) async {
                 await AppPreferences.setDarkModeEnabled(v);

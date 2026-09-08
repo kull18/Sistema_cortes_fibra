@@ -15,7 +15,10 @@ import '../features/technical/presentation/screens/centrales_screen.dart';
 import '../features/technical/presentation/screens/registrar_central_screen.dart';
 import '../features/technical/presentation/screens/mis_eventos_screen.dart';
 import '../features/technical/presentation/screens/mapa_general_screen.dart';
+import '../features/technical/presentation/screens/ficha_central_screen.dart';
+import '../features/technical/presentation/screens/ver_mapa_central_screen.dart';
 import '../features/technical/domain/entities/fiber_event.dart';
+import '../features/technical/domain/entities/central_office_entity.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -34,6 +37,8 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String eventDetail = '/event-detail';
   static const String mapaGeneral = '/mapa-general';
+  static const String fichaCentral = '/ficha-central';
+  static const String verMapaCentral = '/ver-mapa-central';
 
   static Map<String, WidgetBuilder> get routes => {
     splash: (context) => const SplashScreen(),
@@ -52,8 +57,26 @@ class AppRoutes {
     notifications: (context) => const NotificationsScreen(),
     mapaGeneral: (context) => const MapaGeneralScreen(),
     eventDetail: (context) {
-      final event = ModalRoute.of(context)!.settings.arguments as FiberEvent;
-      return EventDetailScreen(event: event);
+      final args = ModalRoute.of(context)!.settings.arguments;
+      if (args is FiberEvent) {
+        return EventDetailScreen(event: args);
+      } else if (args is int) {
+        return EventDetailScreen(eventId: args);
+      } else if (args is String) {
+        final id = int.tryParse(args.split('-').last) ?? int.tryParse(args);
+        return EventDetailScreen(eventId: id);
+      }
+      return const Scaffold(
+        body: Center(child: Text('Parámetros de evento no válidos')),
+      );
+    },
+    fichaCentral: (context) {
+      final office = ModalRoute.of(context)!.settings.arguments as CentralOfficeEntity;
+      return FichaCentralScreen(office: office);
+    },
+    verMapaCentral: (context) {
+      final office = ModalRoute.of(context)!.settings.arguments as CentralOfficeEntity;
+      return VerMapaCentralScreen(office: office);
     },
   };
 }

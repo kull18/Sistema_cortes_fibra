@@ -395,11 +395,6 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
                     Text('(${selectedEvent.kmReference})', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Ubicación: ${selectedEvent.location}',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
-                ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   onPressed: () {

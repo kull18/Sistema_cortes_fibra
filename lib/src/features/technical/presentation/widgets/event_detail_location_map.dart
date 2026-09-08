@@ -1,20 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 import '../../domain/entities/fiber_event.dart';
 
-class EventDetailLocationMap extends StatelessWidget {
+class EventDetailLocationMap extends StatefulWidget {
   final FiberEvent event;
 
   const EventDetailLocationMap({super.key, required this.event});
 
   @override
+  State<EventDetailLocationMap> createState() => _EventDetailLocationMapState();
+}
+
+class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
+  LatLng get _eventPosition {
+    final lat = widget.event.latitude ?? 16.7528;
+    final lng = widget.event.longitude ?? -93.1152;
+    return LatLng(lat, lng);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final pos = _eventPosition;
+    final latFormatted = pos.latitude.toStringAsFixed(4);
+    final lngFormatted = pos.longitude.toStringAsFixed(4);
+    final mapHeight = context.responsiveValue<double>(
+      small: 180.0,
+      medium: 220.0,
+      large: 260.0,
+    );
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
+        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,7 +55,6 @@ class EventDetailLocationMap extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Reemplazamos Spacer por Expanded para manejar el desbordamiento
                 Expanded(
                   child: Align(
                     alignment: Alignment.centerRight,
@@ -45,7 +65,7 @@ class EventDetailLocationMap extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '${event.kmReference} · ${event.location}',
+                        '${widget.event.kmReference} · ${widget.event.location}',
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -61,140 +81,73 @@ class EventDetailLocationMap extends StatelessWidget {
             ),
           ),
           Container(
-            height: 190,
+            height: mapHeight,
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F172A),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
             ),
             clipBehavior: Clip.antiAlias,
-            child: Stack(
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: pos,
+                zoom: 15,
+              ),
+              markers: {
+                Marker(
+                  markerId: const MarkerId('event_location'),
+                  position: pos,
+                  infoWindow: InfoWindow(
+                    title: widget.event.kmReference,
+                    snippet: widget.event.location,
+                  ),
+                ),
+              },
+              myLocationEnabled: false,
+              zoomControlsEnabled: false,
+              mapToolbarEnabled: false,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Center(
-                  child: Opacity(
-                    opacity: 0.2,
-                    child: SvgPicture.asset(
-                      'assets/icons/ic_map.svg',
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                Row(
+                  children: [
+                    const Icon(Icons.my_location, size: 14, color: AppColors.textSecondary),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Lat: $latFormatted, Lng: $lngFormatted',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                Positioned(
-                  left: 40,
-                  bottom: 60,
-                  right: 40,
-                  top: 40,
-                  child: CustomPaint(
-                    painter: _MapLinePainter(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlueSoft,
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                ),
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.gps_fixed, size: 12, color: AppColors.statusRed),
-                        SizedBox(width: 4),
-                        Text(
-                          'GPS: 16.7528° N, -93.1152° W',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF064E3B),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.statusGreen.withOpacity(0.5)),
-                    ),
-                    child: const Text(
-                      'Precisión ±2.1m',
-                      style: TextStyle(color: AppColors.statusGreen, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Sección N3 · Poste CFE #P-142',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              Text(
-                                'Distancia: 14.20 km desde Central TGZ-01',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                  child: const Text(
+                    'GPS',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlue,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
   }
-}
-
-class _MapLinePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primaryBlue
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path()
-      ..moveTo(0, size.height * 0.8)
-      ..lineTo(size.width * 0.3, size.height * 0.6)
-      ..lineTo(size.width * 0.6, size.height * 0.7)
-      ..lineTo(size.width, 0);
-
-    canvas.drawPath(path, paint);
-
-    final markerPaint = Paint()..color = AppColors.statusRed;
-    canvas.drawCircle(const Offset(0, 0), 4, markerPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

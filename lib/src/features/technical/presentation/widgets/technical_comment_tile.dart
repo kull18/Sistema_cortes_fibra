@@ -24,7 +24,9 @@ class TechnicalCommentTile extends StatelessWidget {
           Row(
             children: [
               UserAvatar(
-                imageUrl: comment.userAvatar.isEmpty ? null : comment.userAvatar,
+                imageUrl: (comment.userAvatar != null && comment.userAvatar!.trim().isNotEmpty)
+                    ? comment.userAvatar
+                    : null,
                 size: 32,
                 showStatusDot: true,
               ),

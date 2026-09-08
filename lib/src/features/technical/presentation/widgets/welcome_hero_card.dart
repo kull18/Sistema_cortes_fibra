@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 
 class WelcomeHeroCard extends StatelessWidget {
   final String technicianName;
@@ -13,8 +14,14 @@ class WelcomeHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bannerHeight = context.responsiveValue<double>(
+      small: 120.0,
+      medium: 144.0,
+      large: 160.0,
+    );
+
     return Container(
-      height: 144,
+      height: bannerHeight,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -40,8 +47,8 @@ class WelcomeHeroCard extends StatelessWidget {
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
                 colors: [
-                  AppColors.background.withOpacity(0.95),
-                  AppColors.background.withOpacity(0.4),
+                  AppColors.background.withValues(alpha: 0.95),
+                  AppColors.background.withValues(alpha: 0.4),
                   Colors.transparent,
                 ],
               ),
@@ -49,6 +56,7 @@ class WelcomeHeroCard extends StatelessWidget {
           ),
           Positioned(
             left: 16,
+            right: 16,
             bottom: 16,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,6 +78,8 @@ class WelcomeHeroCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
