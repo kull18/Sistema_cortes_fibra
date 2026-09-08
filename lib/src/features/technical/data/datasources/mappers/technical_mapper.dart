@@ -1,5 +1,6 @@
 import '../../../domain/entities/unread_count_entity.dart';
 import '../../../domain/entities/fiber_event.dart';
+import '../../../domain/entities/reported_by.dart';
 import '../models/unread_count_model.dart';
 import '../models/event_model.dart';
 
@@ -9,8 +10,15 @@ class TechnicalMapper {
   }
 
   static FiberEvent toFiberEventEntity(EventModel model) {
+    final reportedByEntity = ReportedBy(
+      id: model.reportedBy.id,
+      technicianCode: model.reportedBy.technicianCode,
+      fullName: model.reportedBy.fullName,
+    );
+
     return FiberEvent(
       id: 'EV-${model.reportedAt.year}-${model.id.toString().padLeft(3, '0')}',
+      rawId: model.id,
       title: model.type == 'FIBER_CUT' ? 'Corte Total de Fibra Monomodo' : 'Incidencia de Red',
       description: model.description,
       originPrefix: model.originOffice.prefix,
@@ -18,10 +26,14 @@ class TechnicalMapper {
       kmReference: 'Km ${model.distanceToOrigin?.toStringAsFixed(1) ?? '0.0'}',
       location: model.fieldReference ?? '${model.originOffice.city} - ${model.destinationOffice.city}',
       timeLabel: _formatTimeLabel(model.reportedAt),
-      reporterName: 'ID: ${model.reportedById}', 
+      reporterName: reportedByEntity.displayName,
+      reportedBy: reportedByEntity,
       status: _mapStatus(model.status),
       latitude: model.latitude,
       longitude: model.longitude,
+      distanceToOrigin: model.distanceToOrigin,
+      distanceToDestination: model.distanceToDestination,
+      photos: model.photos,
     );
   }
 

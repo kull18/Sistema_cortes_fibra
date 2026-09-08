@@ -7,8 +7,9 @@ import 'api_exception.dart';
 class ApiService implements IApi {
   final String baseUrl;
   String? _authToken;
+  void Function()? onUnauthorized;
 
-  ApiService({required this.baseUrl});
+  ApiService({required this.baseUrl, this.onUnauthorized});
 
   /// Se llama tras un login exitoso, o al restaurar sesion desde storage.
   void setAuthToken(String? token) {
@@ -21,6 +22,12 @@ class ApiService implements IApi {
   };
 
   Uri _uri(String path, [Map<String, dynamic>? query]) {
+    if (baseUrl.trim().isEmpty) {
+      throw const NetworkException(
+        'API_BASE_URL no está configurada. Ejecuta la app con --dart-define-from-file=env/local.json',
+      );
+    }
+
     Map<String, String>? cleanQuery;
 
     if (query != null) {
@@ -29,7 +36,9 @@ class ApiService implements IApi {
       cleanQuery = filtered.map((key, value) => MapEntry(key, value.toString()));
     }
 
-    return Uri.parse('$baseUrl$path').replace(queryParameters: cleanQuery);
+    final cleanBase = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+    final cleanPath = path.startsWith('/') ? path : '/$path';
+    return Uri.parse('$cleanBase$cleanPath').replace(queryParameters: cleanQuery);
   }
 
   Future<Map<String, dynamic>> _send(
@@ -87,6 +96,14 @@ class ApiService implements IApi {
       }
     } catch (_) {
       message = response.reasonPhrase ?? message;
+    }
+
+    if (statusCode == 401 && _authToken != null) {
+      onUnauthorized?.call();
+      throw const ApiException(
+        statusCode: 401,
+        message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+      );
     }
 
     throw ApiException(statusCode: statusCode, message: message);
@@ -258,8 +275,12 @@ class ApiService implements IApi {
   }
 
   @override
-  Future<Map<String, dynamic>> listEvents({String? status}) {
-    return _send('GET', _uri('/events', status != null ? {'status': status} : null));
+  Future<Map<String, dynamic>> listEvents({String? status, String? reportedBy}) {
+    final query = <String, dynamic>{
+      if (status != null) 'status': status,
+      if (reportedBy != null) 'reported_by': reportedBy,
+    };
+    return _send('GET', _uri('/events', query.isNotEmpty ? query : null));
   }
 
   @override

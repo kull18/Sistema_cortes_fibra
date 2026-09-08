@@ -4,7 +4,6 @@ import '../../../../core/app_colors.dart';
 
 class ConfirmationSummarySection extends StatelessWidget {
   final String tramo;
-  final String ubicacion;
   final String tipoIncidente;
   final String reportadoPor;
   final String horaRegistro;
@@ -12,7 +11,6 @@ class ConfirmationSummarySection extends StatelessWidget {
   const ConfirmationSummarySection({
     super.key,
     required this.tramo,
-    required this.ubicacion,
     required this.tipoIncidente,
     required this.reportadoPor,
     required this.horaRegistro,
@@ -31,12 +29,15 @@ class ConfirmationSummarySection extends StatelessWidget {
               colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'Resumen de Datos Confirmados',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+            const Expanded(
+              child: Text(
+                'Resumen de Datos Confirmados',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -46,7 +47,6 @@ class ConfirmationSummarySection extends StatelessWidget {
           child: Divider(color: AppColors.borderSubtle, height: 1),
         ),
         _buildSummaryItem('assets/icons/ic_alarm.svg', 'Tramo Principal:', tramo),
-        _buildSummaryItem('assets/icons/ic_location.svg', 'Ubicación en Campo:', ubicacion),
         _buildSummaryItem(
           'assets/icons/ic_sparkles.svg',
           'Tipo de Incidente:',
@@ -74,28 +74,35 @@ class ConfirmationSummarySection extends StatelessWidget {
             label,
             style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),
-          const Spacer(),
-          if (isBadge)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.connectivityBg,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                value,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-              ),
-            )
-          else
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: isBadge
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.connectivityBg,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        value,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                    ),
             ),
+          ),
         ],
       ),
     );

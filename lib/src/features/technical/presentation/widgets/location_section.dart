@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../../core/models/central.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/numbered_section_card.dart';
 import '../../domain/entities/location_mode.dart';
 import 'location_mode_toggle.dart';
 import 'location_picker_map.dart';
-import 'distance_slider_card.dart';
 
 class LocationSection extends StatelessWidget {
   final LocationMode mode;
@@ -14,11 +12,6 @@ class LocationSection extends StatelessWidget {
   final double? latitude;
   final double? longitude;
   final double? gpsAccuracy;
-  final double kmOnSegment;
-  final Central? origin;
-  final Central? destination;
-  final double totalDistanceKm;
-  final ValueChanged<double> onKmChanged;
   final TextEditingController referenceController;
   final ValueChanged<LatLng> onLocationChanged;
   final VoidCallback onUseGps;
@@ -30,11 +23,6 @@ class LocationSection extends StatelessWidget {
     required this.latitude,
     required this.longitude,
     this.gpsAccuracy,
-    required this.kmOnSegment,
-    required this.origin,
-    required this.destination,
-    required this.totalDistanceKm,
-    required this.onKmChanged,
     required this.referenceController,
     required this.onLocationChanged,
     required this.onUseGps,
@@ -81,15 +69,6 @@ class LocationSection extends StatelessWidget {
               ),
             ),
             
-          const SizedBox(height: 16),
-          DistanceSliderCard(
-            value: kmOnSegment,
-            min: 0,
-            max: totalDistanceKm > 0 ? totalDistanceKm : 1,
-            origin: origin,
-            destination: destination,
-            onChanged: onKmChanged,
-          ),
           const SizedBox(height: 16),
           const Text(
             'Descripción / Referencia de Terreno',

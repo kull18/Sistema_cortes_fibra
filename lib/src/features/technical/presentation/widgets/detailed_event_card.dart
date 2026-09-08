@@ -7,11 +7,15 @@ import 'event_status_chip.dart';
 class DetailedEventCard extends StatelessWidget {
   final FiberEvent event;
   final VoidCallback onVerDetalle;
+  final VoidCallback? onMarcarAtendido;
+  final bool showMarcarAtendido;
 
   const DetailedEventCard({
     super.key,
     required this.event,
     required this.onVerDetalle,
+    this.onMarcarAtendido,
+    this.showMarcarAtendido = false,
   });
 
   @override
@@ -88,26 +92,20 @@ class DetailedEventCard extends StatelessWidget {
             child: Row(
               children: [
                 SvgPicture.asset(
-                  'assets/icons/ic_location.svg',
+                  'assets/icons/ic_clock.svg',
                   width: 14,
+                  height: 14,
                   colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${event.kmReference} - ${event.location}',
+                    event.timeLabel,
                     style: const TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  event.timeLabel,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -126,7 +124,7 @@ class DetailedEventCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    event.reporterName,
+                    event.reporterDisplay,
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
@@ -156,6 +154,26 @@ class DetailedEventCard extends StatelessWidget {
               ),
             ],
           ),
+          if (showMarcarAtendido && event.status == FiberEventStatus.activo && onMarcarAtendido != null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onMarcarAtendido,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.statusGreen,
+                  side: const BorderSide(color: AppColors.statusGreen),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                icon: const Icon(Icons.check_circle_outline, size: 16),
+                label: const Text(
+                  'Marcar como Atendido',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

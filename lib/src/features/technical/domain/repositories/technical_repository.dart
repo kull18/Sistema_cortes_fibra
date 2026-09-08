@@ -5,7 +5,7 @@ import '../entities/fiber_event.dart';
 import '../entities/notification_entity.dart';
 
 abstract class TechnicalRepository {
-  Future<List<FiberEvent>> getEvents({String? status});
+  Future<List<FiberEvent>> getEvents({String? status, String? reportedBy});
   Future<FiberEvent> getEvent(int eventId);
   Future<UnreadCountEntity> getUnreadNotificationsCount();
 

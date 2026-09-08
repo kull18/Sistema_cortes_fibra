@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
+import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/domain/entities/fiber_event.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -11,9 +13,14 @@ import '../widgets/add_technical_note_modal.dart';
 import '../providers/event_detail_provider.dart';
 
 class EventDetailScreen extends StatefulWidget {
-  final FiberEvent event;
+  final FiberEvent? event;
+  final int? eventId;
 
-  const EventDetailScreen({super.key, required this.event});
+  const EventDetailScreen({
+    super.key,
+    this.event,
+    this.eventId,
+  });
 
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
@@ -24,7 +31,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EventDetailProvider>().loadEventDetail(widget.event.id);
+      final idToLoad = widget.event?.id ?? (widget.eventId != null ? widget.eventId.toString() : null);
+      if (idToLoad != null) {
+        context.read<EventDetailProvider>().loadEventDetail(idToLoad);
+      }
     });
   }
 
@@ -53,6 +63,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final authProvider = context.read<AuthProvider>();
     final user = authProvider.user;
 
+    final currentEventId = context.read<EventDetailProvider>().event?.id ?? widget.event?.id ?? 'EV-${widget.eventId}';
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -60,7 +72,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       builder: (context) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: AddTechnicalNoteModal(
-          eventId: widget.event.id,
+          eventId: currentEventId,
           userName: user?.fullName ?? 'Técnico',
           technicianCode: user?.technicianCode ?? 'N/A',
           avatarUrl: user?.profilePhotoUrl,
@@ -93,11 +105,81 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 
+  Widget _buildErrorView(BuildContext context, String errorMessage) {
+    final isUnauthorized = errorMessage.contains('Inicia sesión');
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Detalle de Evento', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isUnauthorized ? Icons.lock_outline : Icons.error_outline,
+                size: 64,
+                color: isUnauthorized ? AppColors.primaryBlue : AppColors.statusRed,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                errorMessage,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  if (isUnauthorized) {
+                    Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+                  } else {
+                    final idToLoad = widget.event?.id ?? (widget.eventId != null ? widget.eventId.toString() : null);
+                    if (idToLoad != null) {
+                      context.read<EventDetailProvider>().loadEventDetail(idToLoad);
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                child: Text(isUnauthorized ? 'Iniciar Sesión' : 'Reintentar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<EventDetailProvider>(
       builder: (context, provider, child) {
+        if (provider.error != null && provider.event == null && widget.event == null) {
+          return _buildErrorView(context, provider.error!);
+        }
+
         final currentEvent = provider.event ?? widget.event;
+
+        if (currentEvent == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Detalle de Evento')),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
 
         return AppScaffold(
           currentTab: AppTab.eventos,
@@ -112,6 +194,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   children: [
                     EventDetailBody(
                       event: currentEvent,
+                      photos: provider.photos,
                       comments: provider.comments,
                     ),
                     Positioned(

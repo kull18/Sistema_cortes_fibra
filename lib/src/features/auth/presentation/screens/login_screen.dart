@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 import '../widgets/app_top_bar.dart';
 import '../widgets/biometric_button.dart';
 import '../widgets/login_card_header.dart';
@@ -69,7 +70,9 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    
+    final cardPadding = context.responsiveValue<double>(small: 12.0, medium: 16.0);
+    final outerPadding = context.responsiveValue<double>(small: 12.0, medium: 16.0);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -81,10 +84,10 @@ class LoginScreen extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(outerPadding),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight - 32,
+                        minHeight: (constraints.maxHeight - (outerPadding * 2)).clamp(0.0, double.infinity),
                       ),
                       child: Center(
                         child: Container(
@@ -111,7 +114,7 @@ class LoginScreen extends StatelessWidget {
                                 subtitle: 'Ingrese sus credenciales de técnico para operar',
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(16),
+                                padding: EdgeInsets.all(cardPadding),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [

@@ -3,7 +3,7 @@ import 'models/unread_count_model.dart';
 import 'models/event_model.dart';
 
 abstract class TechnicalRemoteDataSource {
-  Future<List<EventModel>> getEvents({String? status});
+  Future<List<EventModel>> getEvents({String? status, String? reportedBy});
   Future<EventModel> getEvent(int eventId);
   Future<UnreadCountModel> getUnreadNotificationsCount();
 
@@ -76,8 +76,8 @@ class TechnicalRemoteDataSourceImpl implements TechnicalRemoteDataSource {
   TechnicalRemoteDataSourceImpl({required this.api});
 
   @override
-  Future<List<EventModel>> getEvents({String? status}) async {
-    final response = await api.listEvents(status: status);
+  Future<List<EventModel>> getEvents({String? status, String? reportedBy}) async {
+    final response = await api.listEvents(status: status, reportedBy: reportedBy);
     final List<dynamic> data = response['data'] ?? [];
     return data.map((json) => EventModel.fromJson(json)).toList();
   }

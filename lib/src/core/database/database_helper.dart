@@ -16,7 +16,7 @@ class DatabaseHelper {
     final path = join(await getDatabasesPath(), 'scf_local.db');
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createTables,
       onUpgrade: _onUpgrade,
     );
@@ -28,6 +28,10 @@ class DatabaseHelper {
     }
     if (oldVersion < 3) {
       await _createPendingPhotosTable(db);
+    }
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE events ADD COLUMN reported_by_technician_code TEXT');
+      await db.execute('ALTER TABLE events ADD COLUMN reported_by_full_name TEXT');
     }
   }
 
@@ -62,6 +66,8 @@ class DatabaseHelper {
         description TEXT NOT NULL,
         status TEXT NOT NULL,
         reported_by_id INTEGER NOT NULL,
+        reported_by_technician_code TEXT,
+        reported_by_full_name TEXT,
         reported_at TEXT NOT NULL,
         synced_at TEXT NOT NULL,
         FOREIGN KEY (origin_office_id) REFERENCES central_offices (id),

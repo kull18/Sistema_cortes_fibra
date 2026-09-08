@@ -49,12 +49,14 @@ class AuthProvider extends ChangeNotifier {
         _getProfilePhotoUploadUrlUseCase = getProfilePhotoUploadUrlUseCase,
         _storageService = storageService,
         _userService = userService,
-        _biometricAuthService = biometricAuthService;
+        _biometricAuthService = biometricAuthService {
+    _loadSavedTechnicianId();
+  }
 
   // Form State
   final technicianCodeController = TextEditingController();
   final passwordController = TextEditingController();
-  bool _rememberMe = true;
+  bool _rememberMe = false;
 
   // Obtenemos el usuario directamente del UserService para mantener sincronía
   UserEntity? get user => _userService.currentUser;
@@ -65,13 +67,30 @@ class AuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get rememberMe => _rememberMe;
 
+  Future<void> _loadSavedTechnicianId() async {
+    final savedId = await _storageService.getTechnicianId();
+    if (savedId != null && savedId.isNotEmpty) {
+      technicianCodeController.text = savedId;
+      _rememberMe = true;
+    } else {
+      technicianCodeController.clear();
+      _rememberMe = false;
+    }
+    notifyListeners();
+  }
+
   void setRememberMe(bool value) {
     _rememberMe = value;
+    if (!value) {
+      _storageService.clearTechnicianId();
+    } else if (technicianCodeController.text.trim().isNotEmpty) {
+      _storageService.saveTechnicianId(technicianCodeController.text.trim());
+    }
     notifyListeners();
   }
 
   Future<bool> login() async {
-    final code = technicianCodeController.text;
+    final code = technicianCodeController.text.trim();
     final pass = passwordController.text;
 
     if (code.isEmpty || pass.isEmpty) {
@@ -91,7 +110,10 @@ class AuthProvider extends ChangeNotifier {
       );
 
       if (_rememberMe) {
+        await _storageService.saveTechnicianId(code);
         await registerDevice(deviceLabel: 'Dispositivo Técnico');
+      } else {
+        await _storageService.clearTechnicianId();
       }
 
       _isLoading = false;
@@ -129,6 +151,9 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _deviceLoginUseCase(deviceToken: deviceToken);
+      if (_rememberMe && user?.technicianCode != null && user!.technicianCode.isNotEmpty) {
+        await _storageService.saveTechnicianId(user!.technicianCode);
+      }
       _isLoading = false;
       notifyListeners();
       return true;
@@ -225,8 +250,8 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await _logoutUseCase();
-      technicianCodeController.clear();
       passwordController.clear();
+      await _loadSavedTechnicianId();
     } catch (e) {
       _errorMessage = e.toString();
     } finally {

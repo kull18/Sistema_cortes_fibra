@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import '../../domain/usecases/get_events_usecase.dart';
 import '../../domain/usecases/get_unread_notifications_count_usecase.dart';
+import '../../domain/usecases/update_event_usecase.dart';
 import '../../domain/entities/fiber_event.dart';
 import '../widgets/event_filter_chips.dart';
 import '../../../../core/database/event_local_dao.dart';
+import '../../../../core/api/api_exception.dart';
 
 class HomeProvider extends ChangeNotifier {
   final GetEventsUseCase _getEventsUseCase;
   final GetUnreadNotificationsCountUseCase _getUnreadNotificationsCountUseCase;
+  final UpdateEventUseCase? _updateEventUseCase;
   final EventLocalDao _eventLocalDao = EventLocalDao();
 
   HomeProvider({
     required GetEventsUseCase getEventsUseCase,
     required GetUnreadNotificationsCountUseCase getUnreadNotificationsCountUseCase,
+    UpdateEventUseCase? updateEventUseCase,
   })  : _getEventsUseCase = getEventsUseCase,
-        _getUnreadNotificationsCountUseCase = getUnreadNotificationsCountUseCase;
+        _getUnreadNotificationsCountUseCase = getUnreadNotificationsCountUseCase,
+        _updateEventUseCase = updateEventUseCase;
 
   List<FiberEvent> _events = [];
   int _unreadCount = 0;
@@ -81,6 +86,27 @@ class HomeProvider extends ChangeNotifier {
       if (!silent) notifyListeners();
     } catch (e) {
       debugPrint('Error fetching unread count: $e');
+    }
+  }
+
+  Future<bool> markAsResolved(int eventId) async {
+    if (_updateEventUseCase == null) return false;
+    try {
+      await _updateEventUseCase.execute(eventId: eventId, status: 'RESOLVED');
+      await fetchEvents(silent: true);
+      return true;
+    } on ApiException catch (e) {
+      if (e.statusCode == 403) {
+        _errorMessage = 'Solo quien reportó este evento puede cambiar su estado.';
+      } else {
+        _errorMessage = e.message;
+      }
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 

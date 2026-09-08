@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/app_top_bar.dart';
 import 'login_screen.dart';
@@ -73,6 +74,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final padding = context.responsiveValue<double>(small: 16.0, medium: 24.0);
+    final avatarRadius = context.responsiveValue<double>(small: 40.0, medium: 50.0);
+    final titleFontSize = context.responsiveValue<double>(small: 20.0, medium: 24.0);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -83,17 +87,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             const Divider(height: 1, color: AppColors.borderSubtle),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(padding),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         '¡Bienvenido!',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       const Text(
@@ -101,18 +105,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
                       
                       // Selector de imagen de perfil
                       Center(
                         child: Stack(
                           children: [
                             CircleAvatar(
-                              radius: 50,
+                              radius: avatarRadius,
                               backgroundColor: AppColors.surfaceMuted,
                               backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
                               child: _imageFile == null
-                                  ? const Icon(Icons.person, size: 50, color: AppColors.textSecondary)
+                                  ? Icon(Icons.person, size: avatarRadius, color: AppColors.textSecondary)
                                   : null,
                             ),
                             Positioned(
@@ -126,14 +130,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                     color: AppColors.primaryBlue,
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                                  child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 28),
 
                       TextFormField(
                         controller: _fullNameController,
@@ -144,7 +148,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         ),
                         validator: (value) => value == null || value.isEmpty ? 'Campo obligatorio' : null,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       
                       TextFormField(
                         controller: _emailController,
@@ -155,7 +159,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       
                       TextFormField(
                         controller: _jobTitleController,
@@ -167,7 +171,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 32),
                       ElevatedButton(
                         onPressed: authProvider.isLoading ? null : () => _handleSubmit(context, authProvider),
                         style: ElevatedButton.styleFrom(

@@ -36,7 +36,6 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
   Central? _destination;
 
   LocationMode _locationMode = LocationMode.gps;
-  double _kmOnSegment = 0.0;
   double? _latitude;
   double? _longitude;
   double? _accuracy;
@@ -105,16 +104,112 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
   }
 
   Future<void> _handleAttachPhoto() async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (bottomSheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Agregar Evidencia Fotográfica',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Seleccione la fuente para adjuntar imágenes:',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBlueSoft,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.camera_alt_outlined, color: AppColors.primaryBlue),
+                  ),
+                  title: const Text(
+                    'Tomar foto con Cámara',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'Capturar evidencia fotográfica directamente',
+                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _pickFromCamera();
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBlueSoft,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.photo_library_outlined, color: AppColors.primaryBlue),
+                  ),
+                  title: const Text(
+                    'Seleccionar de Galería',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'Elegir una o varias fotos del almacenamiento',
+                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _pickFromGallery();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickFromCamera() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    
     if (image != null) {
-      final file = File(image.path);
-      final size = await file.length();
-      
+      await _addPhotoEvidence(image);
+    }
+  }
+
+  Future<void> _pickFromGallery() async {
+    final List<XFile> images = await _picker.pickMultiImage();
+    for (final image in images) {
+      await _addPhotoEvidence(image);
+    }
+  }
+
+  Future<void> _addPhotoEvidence(XFile image) async {
+    final file = File(image.path);
+    final size = await file.length();
+    
+    if (mounted) {
       setState(() {
         _evidences.add(
           PhotoEvidence(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            id: '${DateTime.now().millisecondsSinceEpoch}_${image.name}',
             fileName: image.name,
             label: 'Evidencia fotográfica',
             timeLabel: TimeOfDay.now().format(context),
@@ -172,7 +267,7 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
             AppRoutes.confirmacionRegistro,
             arguments: {
               'event': event,
-              'reportedByName': currentUser?.fullName,
+              'reportedByName': event.reportedBy?.displayName ?? currentUser?.fullName ?? currentUser?.technicianCode ?? 'Técnico',
             },
           );
         }
@@ -182,6 +277,27 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
           SnackBar(content: Text(error ?? 'Error al enviar reporte')),
         );
       }
+    }
+  }
+
+  void _onTabSelected(AppTab tab) {
+    if (tab == AppTab.reportar) return;
+
+    switch (tab) {
+      case AppTab.inicio:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        break;
+      case AppTab.centrales:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.centrales);
+        break;
+      case AppTab.reportar:
+        break;
+      case AppTab.eventos:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.eventos);
+        break;
+      case AppTab.perfil:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.perfil);
+        break;
     }
   }
 
@@ -204,11 +320,7 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
 
     return AppScaffold(
       currentTab: AppTab.reportar,
-      onTabSelected: (tab) {
-        if (tab == AppTab.inicio) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-        }
-      },
+      onTabSelected: _onTabSelected,
       appBar: DetailTopBar(
         title: 'Reporte de Evento',
         notificationCount: homeProvider.unreadCount,
@@ -244,11 +356,6 @@ class _ReportarEventoScreenState extends State<ReportarEventoScreen> {
               latitude: _latitude,
               longitude: _longitude,
               gpsAccuracy: _accuracy,
-              kmOnSegment: _kmOnSegment,
-              origin: _origin,
-              destination: _destination,
-              totalDistanceKm: _totalDistanceKm,
-              onKmChanged: (v) => setState(() => _kmOnSegment = v),
               referenceController: _referenceController,
               onLocationChanged: _handleManualLocationChange,
               onUseGps: _useCurrentLocation,

@@ -8,7 +8,7 @@ import 'event_filter_chips.dart';
 class EventsSection extends StatelessWidget {
   final List<FiberEvent> events;
   final EventFilter selectedFilter;
-  final ValueChanged<EventFilter> onFilterChanged;
+  final ValueChanged<EventFilter> onChangedFilter;
   final VoidCallback onVerTodos;
   final ValueChanged<FiberEvent> onEventTap;
 
@@ -16,10 +16,10 @@ class EventsSection extends StatelessWidget {
     super.key,
     required this.events,
     required this.selectedFilter,
-    required this.onFilterChanged,
+    required ValueChanged<EventFilter> onFilterChanged,
     required this.onVerTodos,
     required this.onEventTap,
-  });
+  }) : onChangedFilter = onFilterChanged;
 
   List<FiberEvent> get _filteredEvents {
     switch (selectedFilter) {
@@ -42,29 +42,36 @@ class EventsSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/ic_alarm.svg',
-                  width: 14,
-                  height: 14,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.statusRed,
-                    BlendMode.srcIn,
+            Expanded(
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/ic_alarm.svg',
+                    width: 14,
+                    height: 14,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.statusRed,
+                      BlendMode.srcIn,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6),
-                const Text(
-                  'ÚLTIMOS EVENTOS REGISTRADOS',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                    color: AppColors.textSecondary,
+                  const SizedBox(width: 6),
+                  const Expanded(
+                    child: Text(
+                      'ÚLTIMOS EVENTOS REGISTRADOS',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                        color: AppColors.textSecondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: onVerTodos,
               child: Row(
@@ -94,7 +101,7 @@ class EventsSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        EventFilterChips(selected: selectedFilter, onChanged: onFilterChanged),
+        EventFilterChips(selected: selectedFilter, onChanged: onChangedFilter),
         const SizedBox(height: 16),
         if (filtered.isEmpty)
           const Padding(

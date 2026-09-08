@@ -6,7 +6,7 @@ class GetEventsUseCase {
 
   GetEventsUseCase(this.repository);
 
-  Future<List<FiberEvent>> call({String? status}) {
-    return repository.getEvents(status: status);
+  Future<List<FiberEvent>> call({String? status, String? reportedBy}) {
+    return repository.getEvents(status: status, reportedBy: reportedBy);
   }
 }

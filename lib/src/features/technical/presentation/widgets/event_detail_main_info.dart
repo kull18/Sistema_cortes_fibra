@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/app_colors.dart';
 import '../../domain/entities/fiber_event.dart';
 
@@ -108,7 +109,7 @@ class EventDetailMainInfo extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'HORA DE DETECCIÓN NOC',
+                          'HORA DE DETECCIÓN',
                           style: TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w800,
@@ -121,25 +122,13 @@ class EventDetailMainInfo extends StatelessWidget {
                             const Icon(Icons.access_time, size: 16, color: AppColors.primaryBlue),
                             const SizedBox(width: 6),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    '11:35 AM',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  Text(
-                                    '(Hace 30m)',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                event.timeLabel.isNotEmpty ? event.timeLabel : 'Reciente',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                           ],
@@ -175,7 +164,7 @@ class EventDetailMainInfo extends StatelessWidget {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                event.reporterName,
+                                event.reporterDisplay,
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w900,
@@ -194,9 +183,213 @@ class EventDetailMainInfo extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/ic_ruler.svg',
+                      width: 16,
+                      height: 16,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primaryBlue,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Desplazamiento en Traza',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      event.kmReference,
+                      style: const TextStyle(
+                        fontFamily: 'JetBrainsMono',
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryBlue,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final distOrigin = event.distanceToOrigin ?? 0.0;
+                    final distDest = event.distanceToDestination ?? 0.0;
+                    final total = distOrigin + distDest;
+                    final ratio = total > 0 ? (distOrigin / total).clamp(0.0, 1.0) : 0.0;
+
+                    return Stack(
+                      alignment: Alignment.centerLeft,
+                      children: [
+                        Container(
+                          height: 4,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppColors.connectivityBg,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        FractionallySizedBox(
+                          widthFactor: ratio,
+                          child: Container(
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryBlue,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment(ratio * 2 - 1.0, 0),
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.primaryBlue, width: 2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Distancia a ${event.originPrefix}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${(event.distanceToOrigin ?? 0.0).toStringAsFixed(1)} km',
+                              style: const TextStyle(
+                                fontFamily: 'JetBrainsMono',
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Distancia a ${event.destinationPrefix}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${(event.distanceToDestination ?? 0.0).toStringAsFixed(1)} km',
+                              style: const TextStyle(
+                                fontFamily: 'JetBrainsMono',
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'DESCRIPCIÓN DEL INCIDENTE',
+                  style: TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  event.description.isNotEmpty ? event.description : 'Sin descripción detallada.',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              final rawId = event.rawId ?? int.tryParse(event.id.split('-').last) ?? 0;
+              Share.share(
+                'Reporte de Incidencia SCF - Folio #${event.id}\n'
+                'Tramo: ${event.originPrefix} \u2192 ${event.destinationPrefix} (${event.kmReference})\n'
+                'fibertechops://event/$rawId',
+                subject: 'Ficha de Evento ${event.id}',
+              );
+            },
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 44),
               side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.4)),

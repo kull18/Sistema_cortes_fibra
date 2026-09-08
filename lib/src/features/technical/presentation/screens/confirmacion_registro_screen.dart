@@ -17,7 +17,7 @@ class ConfirmacionRegistroScreen extends StatelessWidget {
     // Extraer argumentos. Esperamos un Map con 'event' y 'reportedByName'
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
     final event = args?['event'] as FiberEvent?;
-    final reportedByName = args?['reportedByName'] as String? ?? 'Técnico de Guardia';
+    final reportedByName = args?['reportedByName'] as String? ?? event?.reportedBy?.displayName ?? event?.reporterName ?? 'Técnico de Guardia';
 
     if (event == null) {
       return const Scaffold(
@@ -33,10 +33,22 @@ class ConfirmacionRegistroScreen extends StatelessWidget {
     return AppScaffold(
       currentTab: AppTab.reportar,
       onTabSelected: (tab) {
-        if (tab == AppTab.inicio) {
-          Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-        } else if (tab == AppTab.eventos) {
-          Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.eventos, (route) => false);
+        switch (tab) {
+          case AppTab.inicio:
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+            break;
+          case AppTab.centrales:
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.centrales, (route) => false);
+            break;
+          case AppTab.reportar:
+            Navigator.of(context).pushReplacementNamed(AppRoutes.reportarEvento);
+            break;
+          case AppTab.eventos:
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.eventos, (route) => false);
+            break;
+          case AppTab.perfil:
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.perfil, (route) => false);
+            break;
         }
       },
       appBar: DetailTopBar(
@@ -61,7 +73,6 @@ class ConfirmacionRegistroScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ConfirmationSummarySection(
               tramo: tramo,
-              ubicacion: event.location.isNotEmpty ? event.location : event.kmReference,
               tipoIncidente: 'Corte de Fibra', // Por ahora estático según el diseño
               reportadoPor: reportedByName,
               horaRegistro: event.timeLabel.isNotEmpty ? event.timeLabel : 'Recién registrado',

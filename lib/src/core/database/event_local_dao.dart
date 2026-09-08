@@ -16,6 +16,11 @@ class EventLocalDao {
       for (final event in events) {
         final originOffice = event['origin_office'] as Map<String, dynamic>;
         final destinationOffice = event['destination_office'] as Map<String, dynamic>;
+        final reportedBy = event['reported_by'] as Map<String, dynamic>?;
+
+        final reportedById = reportedBy?['id'] ?? event['reported_by_id'] ?? 0;
+        final reportedByCode = reportedBy?['technician_code'] ?? '';
+        final reportedByFullName = reportedBy?['full_name'];
 
         await txn.insert('events', {
           'id': event['id'],
@@ -31,7 +36,9 @@ class EventLocalDao {
           'field_reference': event['field_reference'],
           'description': event['description'],
           'status': event['status'],
-          'reported_by_id': event['reported_by_id'],
+          'reported_by_id': reportedById,
+          'reported_by_technician_code': reportedByCode,
+          'reported_by_full_name': reportedByFullName,
           'reported_at': event['reported_at'],
           'synced_at': now,
         }, conflictAlgorithm: ConflictAlgorithm.replace);
@@ -85,6 +92,11 @@ class EventLocalDao {
       reconstructed['origin_office'] = originOffice.isNotEmpty ? originOffice.first : null;
       reconstructed['destination_office'] = destinationOffice.isNotEmpty ? destinationOffice.first : null;
       reconstructed['photos'] = photos;
+      reconstructed['reported_by'] = {
+        'id': event['reported_by_id'],
+        'technician_code': event['reported_by_technician_code'] ?? '',
+        'full_name': event['reported_by_full_name'],
+      };
       
       result.add(reconstructed);
     }

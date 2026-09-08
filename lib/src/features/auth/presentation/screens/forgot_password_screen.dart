@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/app_colors.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/app_top_bar.dart';
 
@@ -53,7 +54,10 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    
+    final padding = context.responsiveValue<double>(small: 16.0, medium: 24.0);
+    final iconSize = context.responsiveValue<double>(small: 48.0, medium: 64.0);
+    final titleFontSize = context.responsiveValue<double>(small: 18.0, medium: 20.0);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -63,29 +67,31 @@ class ForgotPasswordScreen extends StatelessWidget {
             const Divider(height: 1, color: AppColors.borderSubtle),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(padding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 40),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryBlue.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.lock_reset_rounded,
-                        size: 64,
-                        color: AppColors.primaryBlue,
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryBlue.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.lock_reset_rounded,
+                          size: iconSize,
+                          color: AppColors.primaryBlue,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    const Text(
+                    const SizedBox(height: 24),
+                    Text(
                       '¿Olvidaste tu contraseña?',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: titleFontSize,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                       ),
@@ -100,7 +106,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         height: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 28),
                     TextField(
                       controller: authProvider.technicianCodeController,
                       decoration: InputDecoration(
@@ -116,7 +122,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 28),
                     ElevatedButton(
                       onPressed: authProvider.isLoading ? null : () => _handleSubmit(context, authProvider),
                       style: ElevatedButton.styleFrom(

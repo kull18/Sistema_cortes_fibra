@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_cortes_fibra/main.dart';
 import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
       valueListenable: AppPreferences.themeNotifier,
       builder: (_, ThemeMode currentMode, __) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'FiberTech Ops',
           themeMode: currentMode,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 
 class LocationPickerMap extends StatefulWidget {
   final LatLng initialPosition;
@@ -45,10 +46,16 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
 
   @override
   Widget build(BuildContext context) {
+    final mapHeight = context.responsiveValue<double>(
+      small: 180.0,
+      medium: 220.0,
+      large: 260.0,
+    );
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
       child: SizedBox(
-        height: 220,
+        height: mapHeight,
         width: double.infinity,
         child: GoogleMap(
           initialCameraPosition: CameraPosition(

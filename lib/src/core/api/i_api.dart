@@ -90,8 +90,8 @@ abstract class IApi {
     required String description,
   });
 
-  /// GET /events?status=
-  Future<Map<String, dynamic>> listEvents({String? status});
+  /// GET /events?status=&reported_by=
+  Future<Map<String, dynamic>> listEvents({String? status, String? reportedBy});
 
   /// GET /events/{id}
   Future<Map<String, dynamic>> getEvent({required int eventId});
