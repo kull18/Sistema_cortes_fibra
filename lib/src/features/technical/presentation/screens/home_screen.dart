@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -12,7 +12,6 @@ import '../providers/home_provider.dart';
 import '../widgets/welcome_hero_card.dart';
 import '../widgets/quick_access_section.dart';
 import '../widgets/events_section.dart';
-import '../widgets/event_filter_chips.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Datos fake para el esqueleto de eventos
   final List<FiberEvent> _fakeEvents = List.generate(
     3,
-        (index) => FiberEvent(
+    (index) => FiberEvent(
       id: 'EV-2025-000',
       title: 'Corte Total de Fibra Monomodo',
       description: 'Corte detectado en el tramo principal, afectando servicios.',
@@ -70,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final authProvider = context.watch<AuthProvider>();
     final homeProvider = context.watch<HomeProvider>();
     final user = authProvider.user;
@@ -80,8 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppScaffold(
       currentTab: AppTab.inicio,
       onTabSelected: _onTabSelected,
-      isScrollable: false, // Desactivamos el scroll del scaffold porque HomeScreen ya tiene SingleChildScrollView
-      padding: EdgeInsets.zero, // Quitamos padding para que el RefreshIndicator cubra todo
+      isScrollable: false,
+      padding: EdgeInsets.zero,
       appBar: AppTopBar(
         notificationCount: homeProvider.unreadCount,
         avatarUrl: user?.profilePhotoUrl,
@@ -126,12 +126,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(40.0),
                     child: Column(
                       children: [
-                        const Icon(Icons.error_outline, color: AppColors.statusRed, size: 48),
+                        Icon(Icons.error_outline, color: colors.statusRed, size: 48),
                         const SizedBox(height: 16),
                         Text(
                           homeProvider.errorMessage!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: colors.textSecondary),
                         ),
                         TextButton(
                           onPressed: () => homeProvider.initHome(),

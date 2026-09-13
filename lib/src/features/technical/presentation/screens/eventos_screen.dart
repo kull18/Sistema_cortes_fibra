@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -79,6 +79,7 @@ class _EventosScreenState extends State<EventosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
 
@@ -135,17 +136,18 @@ class _EventosScreenState extends State<EventosScreen> {
                   child: TextField(
                     controller: _searchController,
                     onChanged: (value) => setState(() {}),
+                    style: TextStyle(color: colors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Buscar por folio, ubicación o técnico...',
-                      prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+                      prefixIcon: Icon(Icons.search, color: colors.textSecondary),
                       filled: true,
-                      fillColor: AppColors.surfaceMuted,
+                      fillColor: colors.surfaceMuted,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                      hintStyle: TextStyle(fontSize: 13, color: colors.textSecondary),
                     ),
                   ),
                 ),
@@ -159,12 +161,12 @@ class _EventosScreenState extends State<EventosScreen> {
                         'assets/icons/ic_filter.svg',
                         width: 18,
                         height: 18,
-                        colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Estado:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colors.textSecondary),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -185,15 +187,18 @@ class _EventosScreenState extends State<EventosScreen> {
                       child: Text(
                         provider.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: colors.statusRed),
                       ),
                     ),
                   )
                 else if (filteredEvents.isEmpty && !showSkeleton)
-                  const Center(
+                  Center(
                     child: Padding(
-                      padding: EdgeInsets.all(40.0),
-                      child: Text('No se encontraron eventos.'),
+                      padding: const EdgeInsets.all(40.0),
+                      child: Text(
+                        'No se encontraron eventos.',
+                        style: TextStyle(color: colors.textSecondary),
+                      ),
                     ),
                   )
                 else

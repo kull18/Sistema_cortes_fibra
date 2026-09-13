@@ -1,0 +1,66 @@
+name: Build and Deploy to Play Store
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release-key.jks
+
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=app/release-key.jks
+          EOF
+
+      - name: Create production env file
+        run: |
+          cat > env/production.json <<EOF
+          {
+            "API_BASE_URL": "${{ secrets.API_BASE_URL }}",
+            "ONESIGNAL_APP_ID": "${{ secrets.ONESIGNAL_APP_ID }}"
+          }
+          EOF
+
+      - name: Set Maps API Key
+        run: echo "MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> android/local.properties
+
+      - name: Build App Bundle
+        run: flutter build appbundle --release --dart-define-from-file=env/production.json
+
+      - name: Upload to Play Store (Internal Testing)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: com.scf.sistema_cortes_fibra
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+
+      - name: Clean up sensitive files
+        if: always()
+        run: rm -f android/app/release-key.jks android/key.properties android/local.properties env/production.json

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/responsive/responsive_extensions.dart';
+import '../../../../core/theme/dark_map_style.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../domain/entities/fiber_event.dart';
 
 class EventDetailLocationMap extends StatefulWidget {
@@ -22,6 +23,8 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final pos = _eventPosition;
     final latFormatted = pos.latitude.toStringAsFixed(4);
     final lngFormatted = pos.longitude.toStringAsFixed(4);
@@ -33,9 +36,9 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.3)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,14 +47,14 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const Icon(Icons.location_on_outlined, size: 20, color: AppColors.primaryBlue),
+                Icon(Icons.location_on_outlined, size: 20, color: colors.primaryBlue),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'Ubicación Exacta\nde Incidencia',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -61,15 +64,15 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceMuted,
+                        color: colors.surfaceMuted,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         '${widget.event.kmReference} · ${widget.event.location}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -86,10 +89,11 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
+              border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.5)),
             ),
             clipBehavior: Clip.antiAlias,
             child: GoogleMap(
+              style: isDark ? darkMapStyle : null,
               initialCameraPosition: CameraPosition(
                 target: pos,
                 zoom: 15,
@@ -116,13 +120,13 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.my_location, size: 14, color: AppColors.textSecondary),
+                    Icon(Icons.my_location, size: 14, color: colors.textSecondary),
                     const SizedBox(width: 6),
                     Text(
                       'Lat: $latFormatted, Lng: $lngFormatted',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -131,15 +135,15 @@ class _EventDetailLocationMapState extends State<EventDetailLocationMap> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryBlueSoft,
+                    color: colors.primaryBlueSoft,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
+                  child: Text(
                     'GPS',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryBlue,
+                      color: colors.primaryBlue,
                     ),
                   ),
                 ),

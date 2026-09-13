@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
 
 /// Tarjeta con encabezado numerado ("1. Selección de Tramo de Red", etc.),
 /// usada en todos los formularios multi-paso (Reportar, Confirmar, etc.).
@@ -28,16 +28,17 @@ class NumberedSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? AppColors.primaryBlue;
-    final effectiveBgColor = iconBackgroundColor ?? AppColors.primaryBlueSoft;
+    final colors = context.colors;
+    final effectiveIconColor = iconColor ?? colors.primaryBlue;
+    final effectiveBgColor = iconBackgroundColor ?? colors.primaryBlueSoft;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
-        boxShadow: const [
-          BoxShadow(color: AppColors.cardShadow, blurRadius: 3, offset: Offset(0, 1)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(color: colors.shadow, blurRadius: 3, offset: const Offset(0, 1)),
         ],
       ),
       child: Column(
@@ -71,18 +72,18 @@ class NumberedSectionCard extends StatelessWidget {
                     children: [
                       Text(
                         '$stepNumber. $title',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
@@ -95,7 +96,7 @@ class NumberedSectionCard extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: AppColors.borderSubtle.withOpacity(0.3),
+            color: colors.borderSubtle.withValues(alpha: 0.3),
           ),
           Padding(
             padding: const EdgeInsets.all(16),

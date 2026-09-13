@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class PasswordField extends StatefulWidget {
   final TextEditingController controller;
@@ -22,28 +21,30 @@ class _PasswordFieldState extends State<PasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Contraseña de Seguridad',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
               ),
             ),
             GestureDetector(
               onTap: widget.onForgotPassword,
-              child: const Text(
+              child: Text(
                 '¿Olvidó su clave?',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primaryBlue,
+                  color: colors.primaryBlue,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -53,9 +54,9 @@ class _PasswordFieldState extends State<PasswordField> {
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderStrong),
+            border: Border.all(color: colors.borderStrong),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
@@ -64,8 +65,8 @@ class _PasswordFieldState extends State<PasswordField> {
                 'assets/icons/ic_lock_fill.svg',
                 width: 18,
                 height: 18,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.textSecondary,
+                colorFilter: ColorFilter.mode(
+                  colors.textSecondary,
                   BlendMode.srcIn,
                 ),
               ),
@@ -74,10 +75,10 @@ class _PasswordFieldState extends State<PasswordField> {
                 child: TextField(
                   controller: widget.controller,
                   obscureText: _obscureText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'JetBrainsMono',
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -97,7 +98,7 @@ class _PasswordFieldState extends State<PasswordField> {
                   width: 18,
                   height: 18,
                   colorFilter: ColorFilter.mode(
-                    _obscureText ? AppColors.textSecondary : AppColors.primaryBlue,
+                    _obscureText ? colors.textSecondary : colors.primaryBlue,
                     BlendMode.srcIn,
                   ),
                 ),

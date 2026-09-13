@@ -1,14 +1,12 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class BuildSettingTitle extends StatelessWidget {
   final String? icon;
   final IconData? iconData;
-  final  String title;
-  final  String subtitle;
+  final String title;
+  final String subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
 
@@ -19,20 +17,19 @@ class BuildSettingTitle extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.value,
-    required this.onChanged
+    required this.onChanged,
   });
-
-
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -40,12 +37,12 @@ class BuildSettingTitle extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             child: icon != null
                 ? SvgPicture.asset(
-              'assets/icons/$icon',
-              width: 20,
-              height: 20,
-              colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
-            )
-                : Icon(iconData, size: 16, color: AppColors.primaryBlue),
+                    'assets/icons/$icon',
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
+                  )
+                : Icon(iconData, size: 16, color: colors.primaryBlue),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -54,17 +51,17 @@ class BuildSettingTitle extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -77,7 +74,7 @@ class BuildSettingTitle extends StatelessWidget {
               value: value,
               onChanged: onChanged,
               activeColor: Colors.white,
-              activeTrackColor: AppColors.primaryBlue,
+              activeTrackColor: colors.primaryBlue,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),

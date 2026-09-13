@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class ConfirmationSuccessHeader extends StatelessWidget {
   const ConfirmationSuccessHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Column(
       children: [
         Container(
@@ -14,16 +16,16 @@ class ConfirmationSuccessHeader extends StatelessWidget {
           height: 120,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white,
+            color: colors.surface,
             border: Border.all(
-              color: AppColors.statusGreen.withOpacity(0.4),
+              color: colors.statusGreen.withValues(alpha: 0.4),
               width: 2,
             ),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: AppColors.shadow,
+                color: colors.shadow,
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -38,7 +40,7 @@ class ConfirmationSuccessHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.statusGreen.withOpacity(0.1),
+            color: colors.statusGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -47,13 +49,13 @@ class ConfirmationSuccessHeader extends StatelessWidget {
               SvgPicture.asset(
                 'assets/icons/ic_shield.svg',
                 width: 14,
-                colorFilter: const ColorFilter.mode(AppColors.statusGreen, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(colors.statusGreen, BlendMode.srcIn),
               ),
               const SizedBox(width: 6),
-              const Text(
+              Text(
                 'Evento Notificado Correctamente',
                 style: TextStyle(
-                  color: AppColors.statusGreen,
+                  color: colors.statusGreen,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -62,20 +64,20 @@ class ConfirmationSuccessHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           '¡Reporte Enviado con Éxito!',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           'El evento ha sido registrado en el sistema.',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
       ],

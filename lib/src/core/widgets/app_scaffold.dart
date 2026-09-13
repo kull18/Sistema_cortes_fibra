@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
 import 'app_bottom_nav_bar.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -24,6 +24,7 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     Widget mainContent = body;
 
     if (isScrollable) {
@@ -39,13 +40,13 @@ class AppScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
             if (appBar != null) appBar!,
             if (showDivider && appBar != null)
-              const Divider(height: 1, color: AppColors.borderSubtle),
+              Divider(height: 1, color: colors.borderSubtle),
             Expanded(child: mainContent),
           ],
         ),

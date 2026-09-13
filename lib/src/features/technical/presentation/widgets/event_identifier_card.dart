@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class EventIdentifierCard extends StatelessWidget {
   final String folio;
@@ -16,61 +16,61 @@ class EventIdentifierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
-        boxShadow: const [
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
+            color: colors.shadow,
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Cabecera con fondo gris
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: AppColors.cardHeaderBg,
+            color: colors.cardHeaderBg,
             width: double.infinity,
             child: Row(
               children: [
                 SvgPicture.asset(
                   'assets/icons/ic_file.svg',
                   width: 18,
-                  colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'IDENTIFICADOR ÚNICO DE EVENTO',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.borderSubtle),
+          Divider(height: 1, color: colors.borderSubtle),
           
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Caja del Folio
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.primaryBlue.withOpacity(0.3), width: 1.2),
+                    border: Border.all(color: colors.primaryBlue.withValues(alpha: 0.3), width: 1.2),
                   ),
                   child: Row(
                     children: [
@@ -78,35 +78,34 @@ class EventIdentifierCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'NÚMERO DE FOLIO',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textSecondary,
+                                color: colors.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               folio,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primaryBlue,
+                                color: colors.primaryBlue,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      // Botón Copiar estilizado
                       GestureDetector(
                         onTap: onCopy,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colors.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.borderSubtle),
+                            border: Border.all(color: colors.borderSubtle),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -114,15 +113,15 @@ class EventIdentifierCard extends StatelessWidget {
                               SvgPicture.asset(
                                 'assets/icons/ic_copy.svg',
                                 width: 16,
-                                colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 'Copiar',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
+                                  color: colors.textPrimary,
                                 ),
                               ),
                             ],
@@ -130,25 +129,24 @@ class EventIdentifierCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Icono Compartir
                       GestureDetector(
                         onTap: onShare,
                         child: SvgPicture.asset(
                           'assets/icons/ic_share.svg',
                           width: 22,
-                          colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(colors.textSecondary, BlendMode.srcIn),
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Guarde este identificador para dar seguimiento con el Centro de Control.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                     height: 1.4,
                   ),
                 ),

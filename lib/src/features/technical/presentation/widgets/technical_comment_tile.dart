@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
-import 'package:sistema_cortes_fibra/src/core/widgets/user_avatar.dart';
+import '../../../../core/theme/theme_extensions.dart';
+import '../../../../core/widgets/user_avatar.dart';
 import '../../domain/entities/technical_comment.dart';
 
 class TechnicalCommentTile extends StatelessWidget {
@@ -10,13 +10,15 @@ class TechnicalCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,17 +39,17 @@ class TechnicalCommentTile extends StatelessWidget {
                   children: [
                     Text(
                       comment.userName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     Text(
                       comment.userRole,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ],
@@ -60,7 +62,7 @@ class TechnicalCommentTile extends StatelessWidget {
                     'hace ${comment.timeAgo}',
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.textSecondary.withOpacity(0.7),
+                      color: colors.textSecondary.withValues(alpha: 0.7),
                     ),
                   ),
                   Text(
@@ -68,7 +70,7 @@ class TechnicalCommentTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary.withOpacity(0.8),
+                      color: colors.textSecondary.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -78,9 +80,9 @@ class TechnicalCommentTile extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             comment.content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               height: 1.5,
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class SecuritySection extends StatelessWidget {
   final VoidCallback onChangePassword;
@@ -9,12 +9,14 @@ class SecuritySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted.withOpacity(0.05),
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,21 +29,21 @@ class SecuritySection extends StatelessWidget {
                   'assets/icons/ic_shield_check.svg',
                   width: 20,
                   height: 20,
-                  colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'Seguridad',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.borderSubtle, thickness: 0.5),
+          Divider(height: 1, color: colors.borderSubtle, thickness: 0.5),
           Material(
             color: Colors.transparent,
             borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
@@ -52,16 +54,17 @@ class SecuritySection extends StatelessWidget {
                 'assets/icons/ic_key.svg',
                 width: 20,
                 height: 20,
+                colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
               ),
-              title: const Text(
+              title: Text(
                 'Cambiar Contraseña de Acceso',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
-              trailing: const Icon(Icons.chevron_right, size: 20),
+              trailing: Icon(Icons.chevron_right, size: 20, color: colors.textSecondary),
               onTap: onChangePassword,
             ),
           ),

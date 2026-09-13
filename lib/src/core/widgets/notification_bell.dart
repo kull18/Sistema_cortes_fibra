@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
 
 /// Campana de notificaciones con contador, compartida entre todas
 /// las screens con header autenticado.
@@ -12,6 +12,8 @@ class NotificationBell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -25,8 +27,8 @@ class NotificationBell extends StatelessWidget {
                 'assets/icons/ic_bell.svg',
                 width: 22,
                 height: 22,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.textPrimary,
+                colorFilter: ColorFilter.mode(
+                  colors.textPrimary,
                   BlendMode.srcIn,
                 ),
               ),
@@ -39,8 +41,8 @@ class NotificationBell extends StatelessWidget {
                   width: 16,
                   height: 16,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: AppColors.statusRed,
+                  decoration: BoxDecoration(
+                    color: colors.statusRed,
                     shape: BoxShape.circle,
                   ),
                   child: Text(
