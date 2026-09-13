@@ -34,7 +34,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.example.sistemaCortesFibra</string>
+			<string>com.scf.sistemaCortesFibra</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>fibertechops</string>

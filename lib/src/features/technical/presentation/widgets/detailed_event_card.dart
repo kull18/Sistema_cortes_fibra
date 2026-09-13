@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../domain/entities/fiber_event.dart';
 import 'event_status_chip.dart';
 
@@ -20,17 +20,19 @@ class DetailedEventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
-        boxShadow: const [
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.2)),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
+            color: colors.shadow,
             blurRadius: 6,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -43,15 +45,15 @@ class DetailedEventCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
+                  color: colors.surfaceMuted,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   event.id,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
               ),
@@ -59,10 +61,10 @@ class DetailedEventCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   '${event.originPrefix} \u2192 ${event.destinationPrefix}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ),
@@ -70,13 +72,13 @@ class DetailedEventCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(height: 1, color: AppColors.borderSubtle),
+          Divider(height: 1, color: colors.borderSubtle),
           const SizedBox(height: 12),
           Text(
             event.description,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
               height: 1.4,
             ),
             maxLines: 2,
@@ -86,7 +88,7 @@ class DetailedEventCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
+              color: colors.surfaceMuted,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -95,16 +97,16 @@ class DetailedEventCard extends StatelessWidget {
                   'assets/icons/ic_clock.svg',
                   width: 14,
                   height: 14,
-                  colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     event.timeLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
@@ -120,34 +122,34 @@ class DetailedEventCard extends StatelessWidget {
                   SvgPicture.asset(
                     'assets/icons/ic_user.svg',
                     width: 14,
-                    colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(colors.textSecondary, BlendMode.srcIn),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     event.reporterDisplay,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                     ),
                   ),
                 ],
               ),
               InkWell(
                 onTap: onVerDetalle,
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
                       'Ver detalle',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryBlue,
+                        color: colors.primaryBlue,
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
                       size: 16,
-                      color: AppColors.primaryBlue,
+                      color: colors.primaryBlue,
                     ),
                   ],
                 ),
@@ -161,8 +163,8 @@ class DetailedEventCard extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onMarcarAtendido,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.statusGreen,
-                  side: const BorderSide(color: AppColors.statusGreen),
+                  foregroundColor: colors.statusGreen,
+                  side: BorderSide(color: colors.statusGreen),
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),

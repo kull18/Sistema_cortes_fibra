@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -58,18 +58,19 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
     final success = await provider.markAsResolved(eventId);
 
     if (mounted) {
+      final colors = context.colors;
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Evento marcado como Atendido'),
-            backgroundColor: AppColors.statusGreen,
+          SnackBar(
+            content: const Text('Evento marcado como Atendido'),
+            backgroundColor: colors.statusGreen,
           ),
         );
       } else if (provider.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(provider.errorMessage!),
-            backgroundColor: AppColors.statusRed,
+            backgroundColor: colors.statusRed,
           ),
         );
       }
@@ -78,6 +79,7 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final authProvider = context.watch<AuthProvider>();
     final homeProvider = context.watch<HomeProvider>();
     final user = authProvider.user;
@@ -122,9 +124,9 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
                 // Filtros
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Estado:',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colors.textSecondary),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -140,27 +142,27 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'HISTORIAL PERSONAL',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         letterSpacing: 1.0,
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryBlueSoft,
+                        color: colors.primaryBlueSoft,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         '${events.length} Reportes',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.primaryBlue,
+                          color: colors.primaryBlue,
                         ),
                       ),
                     ),
@@ -175,12 +177,12 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
                       child: Text(
                         provider.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.statusRed),
+                        style: TextStyle(color: colors.statusRed),
                       ),
                     ),
                   )
                 else if (events.isEmpty && !showSkeleton)
-                  _buildEmptyState()
+                  _buildEmptyState(context)
                 else
                   Skeletonizer(
                     enabled: showSkeleton,
@@ -206,7 +208,9 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final colors = context.colors;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 60),
@@ -214,27 +218,27 @@ class _MisEventosScreenState extends State<MisEventosScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F5F9),
+              decoration: BoxDecoration(
+                color: colors.surfaceMuted,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.history_outlined, size: 40, color: AppColors.placeholder),
+              child: Icon(Icons.history_outlined, size: 40, color: colors.placeholder),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Aún no has publicado eventos',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'Tus reportes aparecerán listados aquí.',
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
             ),
           ],

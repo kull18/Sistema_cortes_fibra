@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
+
 enum AppTab { inicio, centrales, reportar, eventos, perfil }
 
 /// Bottom navigation compartida entre Home, Centrales, Reportar, Eventos y Perfil.
@@ -18,18 +19,19 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final authProvider = context.watch<AuthProvider>();
     final isAdmin = authProvider.user?.role == 'ADMIN';
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(top: BorderSide(color: colors.borderSubtle)),
         boxShadow: [
           BoxShadow(
-            color: Color(0x0D000000),
+            color: colors.shadow,
             blurRadius: 10,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -92,7 +94,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? Colors.black : const Color(0xFF6B7280);
+    final colors = context.colors;
+    final color = isSelected ? colors.primaryBlue : colors.textSecondary;
 
     return Expanded(
       child: InkWell(

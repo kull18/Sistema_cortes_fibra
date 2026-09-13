@@ -11,11 +11,17 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-# Environment files
-env/local.json
 
-#env
+# Environment files
+env/*.json
+!env/local.example.json
 .env
+
+# Android signing keystores and properties
+*.jks
+*.keystore
+android/key.properties
+!android/key.properties.example
 
 # IntelliJ related
 *.iml

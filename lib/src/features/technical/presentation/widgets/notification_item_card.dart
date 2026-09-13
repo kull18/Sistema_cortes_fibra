@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class NotificationItemCard extends StatelessWidget {
   final String id;
@@ -30,13 +30,15 @@ class NotificationItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isUnread ? const Color(0xFFF0F7FF) : Colors.white,
+        color: isUnread ? colors.primaryBlueSoft : colors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isUnread ? AppColors.primaryBlue : AppColors.borderSubtle.withOpacity(0.3),
+          color: isUnread ? colors.primaryBlue : colors.borderSubtle.withValues(alpha: 0.3),
           width: isUnread ? 2 : 1,
         ),
       ),
@@ -52,37 +54,37 @@ class NotificationItemCard extends StatelessWidget {
                     width: 10,
                     height: 10,
                     margin: const EdgeInsets.only(right: 10),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primaryBlue,
+                    decoration: BoxDecoration(
+                      color: colors.primaryBlue,
                       shape: BoxShape.circle,
                     ),
                   ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8E9EA),
+                    color: colors.surfaceMuted,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+                    border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.2)),
                   ),
                   child: Text(
                     id,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
                 const Spacer(),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: AppColors.textSecondary.withOpacity(0.7)),
+                    Icon(Icons.access_time, size: 14, color: colors.textSecondary.withValues(alpha: 0.7)),
                     const SizedBox(width: 4),
                     Text(
                       time,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary.withOpacity(0.7),
+                        color: colors.textSecondary.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -90,7 +92,7 @@ class NotificationItemCard extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
+          Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16, color: colors.borderSubtle),
           // Content: Icon, Title, Description, Location
           Padding(
             padding: const EdgeInsets.all(16),
@@ -101,7 +103,7 @@ class NotificationItemCard extends StatelessWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1F21),
+                    color: colors.primaryBlueSoft,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
@@ -109,7 +111,7 @@ class NotificationItemCard extends StatelessWidget {
                       'assets/icons/$icon',
                       width: 28,
                       height: 28,
-                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                     ),
                   ),
                 ),
@@ -120,10 +122,10 @@ class NotificationItemCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -131,7 +133,7 @@ class NotificationItemCard extends StatelessWidget {
                         description,
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary.withOpacity(0.8),
+                          color: colors.textSecondary.withValues(alpha: 0.8),
                           height: 1.4,
                         ),
                       ),
@@ -142,15 +144,15 @@ class NotificationItemCard extends StatelessWidget {
                             'assets/icons/ic_layers.svg',
                             width: 16,
                             height: 16,
-                            colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                            colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             location,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primaryBlue,
+                              color: colors.primaryBlue,
                             ),
                           ),
                         ],
@@ -161,7 +163,7 @@ class NotificationItemCard extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16),
+          Divider(height: 1, thickness: 0.5, indent: 16, endIndent: 16, color: colors.borderSubtle),
           // Actions: Mark as read, Delete, View
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
@@ -171,15 +173,15 @@ class NotificationItemCard extends StatelessWidget {
                   GestureDetector(
                     onTap: onMarkAsRead,
                     child: Row(
-                      children: const [
-                        Icon(Icons.check, size: 18, color: AppColors.primaryBlue),
-                        SizedBox(width: 6),
+                      children: [
+                        Icon(Icons.check, size: 18, color: colors.primaryBlue),
+                        const SizedBox(width: 6),
                         Text(
                           'Marcar leída',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primaryBlue,
+                            color: colors.primaryBlue,
                           ),
                         ),
                       ],
@@ -192,56 +194,33 @@ class NotificationItemCard extends StatelessWidget {
                         'assets/icons/ic_double_check.svg',
                         width: 18,
                         height: 18,
-                        colorFilter: const ColorFilter.mode(AppColors.statusGreen, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(colors.statusGreen, BlendMode.srcIn),
                       ),
                       const SizedBox(width: 6),
-                      const Text(
+                      Text(
                         'Leído',
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.statusGreen,
+                          fontWeight: FontWeight.w500,
+                          color: colors.statusGreen,
                         ),
                       ),
                     ],
                   ),
                 const Spacer(),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: SvgPicture.asset(
-                    'assets/icons/ic_trash.svg',
-                    width: 20,
-                    height: 20,
-                    colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-                const SizedBox(width: 8), // Reducido el espacio entre botones
-                ElevatedButton(
-                  onPressed: onView,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE8E9EA),
-                    foregroundColor: AppColors.textPrimary,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    minimumSize: Size.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.2)),
+                if (onView != null)
+                  TextButton.icon(
+                    onPressed: onView,
+                    icon: Icon(Icons.arrow_forward, size: 16, color: colors.primaryBlue),
+                    label: Text(
+                      'Ver evento',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: colors.primaryBlue,
+                      ),
                     ),
                   ),
-                  child: Row(
-                    children: const [
-                      Text(
-                        'Ver',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(width: 6),
-                      Icon(Icons.chevron_right, size: 18),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),

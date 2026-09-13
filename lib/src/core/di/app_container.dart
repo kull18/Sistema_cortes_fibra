@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../api/api_service.dart';
 import '../api/biometric_auth_service.dart';
 import '../api/i_api.dart';
@@ -85,6 +87,17 @@ class AppContainer {
     final savedUser = await UserPreferences.getUser();
     if (savedUser != null) {
       _userService.setCurrentUser(savedUser);
+      if (savedUser.technicianCode.isNotEmpty) {
+        try {
+          await OneSignal.login(savedUser.technicianCode);
+          final playerId = OneSignal.User.pushSubscription.id;
+          if (playerId != null && playerId.isNotEmpty) {
+            await _api.registerDeviceToken(playerId: playerId);
+          }
+        } catch (e) {
+          debugPrint('Error sincronizando OneSignal en inicio: $e');
+        }
+      }
     }
   }
 

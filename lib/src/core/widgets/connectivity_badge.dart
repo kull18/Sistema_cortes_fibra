@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
 
 class ConnectivityBadge extends StatelessWidget {
   final bool isOnline;
@@ -9,18 +9,19 @@ class ConnectivityBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = isOnline ? AppColors.statusGreen : AppColors.statusRed;
+    final colors = context.colors;
+    final statusColor = isOnline ? colors.statusGreen : colors.statusRed;
 
     return Container(
       width: 32,
       height: 32,
       decoration: BoxDecoration(
-        color: AppColors.connectivityBg,
+        color: colors.connectivityBg,
         shape: BoxShape.circle,
         border: Border.all(
           color: isOnline
-              ? AppColors.borderSubtle.withOpacity(0.3)
-              : AppColors.statusRed.withOpacity(0.2),
+              ? colors.borderSubtle.withValues(alpha: 0.3)
+              : colors.statusRed.withValues(alpha: 0.2),
         ),
       ),
       child: Center(
@@ -45,8 +46,7 @@ class ConnectivityBadge extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: statusColor,
                     borderRadius: BorderRadius.circular(1),
-                    // Pequeño borde blanco para que la línea se note más sobre el SVG
-                    border: Border.all(color: AppColors.connectivityBg, width: 0.5),
+                    border: Border.all(color: colors.connectivityBg, width: 0.5),
                   ),
                 ),
               ),

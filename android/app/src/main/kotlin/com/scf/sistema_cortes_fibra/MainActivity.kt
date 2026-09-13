@@ -1,4 +1,4 @@
-package com.example.sistema_cortes_fibra
+package com.scf.sistema_cortes_fibra
 
 import io.flutter.embedding.android.FlutterActivity
 

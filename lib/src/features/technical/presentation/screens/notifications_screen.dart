@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_header_actions.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -86,6 +86,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
     final homeProvider = context.watch<HomeProvider>();
@@ -111,13 +112,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             preferredSize: const Size.fromHeight(64),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: AppColors.background,
+              color: colors.background,
               child: SafeArea(
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: AppColors.textPrimary),
+                      icon: Icon(Icons.arrow_back_ios_new, size: 20, color: colors.textPrimary),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
@@ -126,20 +127,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             'Notificaciones',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: colors.textPrimary,
                             ),
                           ),
                           Text(
                             'Avisos y Telemetría NOC',
                             style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textSecondary,
+                              color: colors.textSecondary,
                             ),
                           ),
                         ],
@@ -167,11 +168,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               padding: const EdgeInsets.only(bottom: 32),
               children: [
                 const SizedBox(height: 16),
-                _buildSummaryCard(provider.notifications.length, unreadCount),
+                _buildSummaryCard(context, provider.notifications.length, unreadCount),
                 const SizedBox(height: 20),
-                _buildSearchBar(),
+                _buildSearchBar(context),
                 const SizedBox(height: 16),
-                _buildFilterChips(provider.notifications.length, unreadCount, provider.notifications.where((n) => n.type == NotificationType.eventCreated).length),
+                _buildFilterChips(context, provider.notifications.length, unreadCount, provider.notifications.where((n) => n.type == NotificationType.eventCreated).length),
                 const SizedBox(height: 20),
                 if (provider.isLoading && provider.notifications.isEmpty)
                   const Center(child: Padding(
@@ -208,13 +209,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildSummaryCard(int total, int unread) {
+  Widget _buildSummaryCard(BuildContext context, int total, int unread) {
+    final colors = context.colors;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -223,46 +226,46 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlue.withOpacity(0.1),
+                  color: colors.primaryBlueSoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: SvgPicture.asset(
                   'assets/icons/ic_bell.svg',
                   width: 24,
                   height: 24,
-                  colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Avisos Técnicos de Red', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-                    Text('Monitoreo NOC - Fibra Óptica', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  children: [
+                    Text('Avisos Técnicos de Red', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: colors.textPrimary)),
+                    Text('Monitoreo NOC - Fibra Óptica', style: TextStyle(fontSize: 12, color: colors.textSecondary)),
                   ],
                 ),
               ),
               if (unread > 0)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(color: AppColors.statusRed.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-                  child: Text('$unread sin leer', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.statusRed)),
+                  decoration: BoxDecoration(color: colors.statusRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                  child: Text('$unread sin leer', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colors.statusRed)),
                 ),
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(height: 1),
+          Divider(height: 1, color: colors.borderSubtle),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total: $total avisos', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              Text('Total: $total avisos', style: TextStyle(fontSize: 12, color: colors.textSecondary)),
               Row(
-                children: const [
-                  Icon(Icons.done_all, size: 16, color: AppColors.primaryBlue),
-                  SizedBox(width: 4),
-                  Text('Marcar todas leídas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primaryBlue)),
+                children: [
+                  Icon(Icons.done_all, size: 16, color: colors.primaryBlue),
+                  const SizedBox(width: 4),
+                  Text('Marcar todas leídas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colors.primaryBlue)),
                 ],
               ),
             ],
@@ -272,52 +275,57 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final colors = context.colors;
+
     return TextField(
       controller: _searchController,
       onChanged: (val) => setState(() {}),
+      style: TextStyle(color: colors.textPrimary),
       decoration: InputDecoration(
         hintText: 'Buscar por folio, tramo o descripción...',
-        hintStyle: const TextStyle(fontSize: 13, color: AppColors.placeholder),
-        prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.placeholder),
+        hintStyle: TextStyle(fontSize: 13, color: colors.placeholder),
+        prefixIcon: Icon(Icons.search, size: 20, color: colors.placeholder),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: colors.surface,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3))),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: colors.borderSubtle.withValues(alpha: 0.3))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: colors.borderSubtle.withValues(alpha: 0.3))),
       ),
     );
   }
 
-  Widget _buildFilterChips(int total, int unread, int cuts) {
+  Widget _buildFilterChips(BuildContext context, int total, int unread, int cuts) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFilterChip('Todas ($total)', 0),
+          _buildFilterChip(context, 'Todas ($total)', 0),
           const SizedBox(width: 8),
-          _buildFilterChip('No leídas ($unread)', 1),
+          _buildFilterChip(context, 'No leídas ($unread)', 1),
           const SizedBox(width: 8),
-          _buildFilterChip('Cortes de Fibra ($cuts)', 2),
+          _buildFilterChip(context, 'Cortes de Fibra ($cuts)', 2),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, int index) {
+  Widget _buildFilterChip(BuildContext context, String label, int index) {
+    final colors = context.colors;
     bool isSelected = _selectedFilterIndex == index;
+
     return GestureDetector(
       onTap: () => setState(() => _selectedFilterIndex = index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryBlue : Colors.white,
+          color: isSelected ? colors.primaryBlue : colors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? AppColors.primaryBlue : AppColors.borderSubtle.withOpacity(0.3)),
+          border: Border.all(color: isSelected ? colors.primaryBlue : colors.borderSubtle.withValues(alpha: 0.3)),
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? Colors.white : AppColors.textSecondary),
+          style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? Colors.white : colors.textSecondary),
         ),
       ),
     );

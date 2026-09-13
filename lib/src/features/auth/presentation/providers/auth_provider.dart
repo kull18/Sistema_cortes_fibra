@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:sistema_cortes_fibra/src/core/di/app_container.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
@@ -89,6 +91,24 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> registerOneSignalUser(String technicianCode) async {
+    try {
+      debugPrint('DEBUG [OneSignal] Login OneSignal con external_id: $technicianCode');
+      await OneSignal.login(technicianCode);
+
+      final playerId = OneSignal.User.pushSubscription.id;
+      debugPrint('DEBUG [OneSignal] pushSubscription ID (playerId): $playerId');
+
+      if (playerId != null && playerId.isNotEmpty) {
+        final api = AppContainer().api;
+        await api.registerDeviceToken(playerId: playerId);
+        debugPrint('DEBUG [OneSignal] Token de dispositivo registrado en nuestro backend correctamente.');
+      }
+    } catch (e, stack) {
+      debugPrint('DEBUG [OneSignal] Error registrando usuario/dispositivo: $e\n$stack');
+    }
+  }
+
   Future<bool> login() async {
     final code = technicianCodeController.text.trim();
     final pass = passwordController.text;
@@ -115,6 +135,8 @@ class AuthProvider extends ChangeNotifier {
       } else {
         await _storageService.clearTechnicianId();
       }
+
+      await registerOneSignalUser(code);
 
       _isLoading = false;
       notifyListeners();
@@ -154,6 +176,9 @@ class AuthProvider extends ChangeNotifier {
       if (_rememberMe && user?.technicianCode != null && user!.technicianCode.isNotEmpty) {
         await _storageService.saveTechnicianId(user!.technicianCode);
       }
+      if (user?.technicianCode != null && user!.technicianCode.isNotEmpty) {
+        await registerOneSignalUser(user!.technicianCode);
+      }
       _isLoading = false;
       notifyListeners();
       return true;
@@ -170,7 +195,7 @@ class AuthProvider extends ChangeNotifier {
       await _registerDeviceUseCase(deviceLabel: deviceLabel);
       return true;
     } catch (e) {
-      debugPrint('Error registrando dispositivo: \$e');
+      debugPrint('Error registrando dispositivo: $e');
       return false;
     }
   }
@@ -249,6 +274,13 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
+      try {
+        await OneSignal.logout();
+        debugPrint('DEBUG [OneSignal] Sesión cerrada en OneSignal');
+      } catch (e) {
+        debugPrint('DEBUG [OneSignal] Error al cerrar sesión en OneSignal: $e');
+      }
+
       await _logoutUseCase();
       passwordController.clear();
       await _loadSavedTechnicianId();

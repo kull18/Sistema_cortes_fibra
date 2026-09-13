@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class PrimaryLoginButton extends StatelessWidget {
   final bool isLoading;
@@ -14,44 +13,46 @@ class PrimaryLoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return SizedBox(
       height: 48,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryBlue,
-          foregroundColor: AppColors.background,
+          backgroundColor: colors.primaryBlue,
+          foregroundColor: Colors.white,
           elevation: 4,
-          shadowColor: AppColors.shadow,
+          shadowColor: colors.shadow,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ).copyWith(
-          overlayColor: WidgetStateProperty.all(AppColors.primaryBlueHover),
+          overlayColor: WidgetStateProperty.all(colors.primaryBlueHover),
         ),
         child: isLoading
             ? const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Colors.white,
-          ),
-        )
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
             : const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Iniciar sesión',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Iniciar sesión',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(Icons.arrow_forward, size: 16),
+                ],
               ),
-            ),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_forward, size: 16),
-          ],
-        ),
       ),
     );
   }

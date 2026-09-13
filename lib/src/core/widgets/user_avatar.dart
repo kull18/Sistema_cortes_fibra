@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../app_colors.dart';
+import '../theme/app_color_scheme.dart';
+import '../theme/theme_extensions.dart';
 
 /// Avatar del técnico con indicador de estado (online), compartido
 /// entre el header y la screen de Perfil.
@@ -17,6 +18,8 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return SizedBox(
       width: size,
       height: size,
@@ -26,13 +29,13 @@ class UserAvatar extends StatelessWidget {
           ClipOval(
             child: imageUrl != null
                 ? Image.network(
-              imageUrl!,
-              width: size,
-              height: size,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _fallback(),
-            )
-                : _fallback(),
+                    imageUrl!,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => _fallback(colors),
+                  )
+                : _fallback(colors),
           ),
           if (showStatusDot)
             Positioned(
@@ -42,9 +45,9 @@ class UserAvatar extends StatelessWidget {
                 width: size * 0.28,
                 height: size * 0.28,
                 decoration: BoxDecoration(
-                  color: AppColors.onlineGreen,
+                  color: colors.onlineGreen,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(color: colors.surface, width: 1.5),
                 ),
               ),
             ),
@@ -53,15 +56,15 @@ class UserAvatar extends StatelessWidget {
     );
   }
 
-  Widget _fallback() {
+  Widget _fallback(AppColorScheme colorScheme) {
     return Container(
       width: size,
       height: size,
-      color: AppColors.primaryBlueSoft,
+      color: colorScheme.primaryBlueSoft,
       child: Icon(
         Icons.person,
         size: size * 0.6,
-        color: AppColors.primaryBlue,
+        color: colorScheme.primaryBlue,
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class ConfirmationActions extends StatelessWidget {
   final VoidCallback onVerEventos;
@@ -16,12 +16,14 @@ class ConfirmationActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Column(
       children: [
         ElevatedButton(
           onPressed: onVerEventos,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryBlue,
+            backgroundColor: colors.primaryBlue,
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 50),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -47,13 +49,13 @@ class ConfirmationActions extends StatelessWidget {
           icon: SvgPicture.asset(
             'assets/icons/ic_home.svg',
             width: 20,
-            colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(colors.textSecondary, BlendMode.srcIn),
           ),
           label: const Text('Volver a Inicio'),
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.textSecondary,
+            foregroundColor: colors.textSecondary,
             minimumSize: const Size(double.infinity, 50),
-            side: const BorderSide(color: AppColors.borderSubtle),
+            side: BorderSide(color: colors.borderSubtle),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
@@ -63,11 +65,11 @@ class ConfirmationActions extends StatelessWidget {
           icon: SvgPicture.asset(
             'assets/icons/ic_plus.svg',
             width: 20,
-            colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
           ),
           label: const Text('Reportar Otro Corte de Fibra'),
           style: TextButton.styleFrom(
-            foregroundColor: AppColors.primaryBlue,
+            foregroundColor: colors.primaryBlue,
           ),
         ),
       ],

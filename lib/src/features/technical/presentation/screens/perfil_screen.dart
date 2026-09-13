@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
+import 'package:sistema_cortes_fibra/src/core/theme/theme_extensions.dart';
 import 'package:sistema_cortes_fibra/src/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/providers/home_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/build_info_card.dart';
@@ -9,7 +10,6 @@ import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/logout_button.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/security_section.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/presentation/widgets/user_header.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -24,14 +24,12 @@ class PerfilScreen extends StatefulWidget {
 class _PerfilScreenState extends State<PerfilScreen> {
   late bool _notificaciones;
   late bool _sincronizacion;
-  late bool _modoOscuro;
 
   @override
   void initState() {
     super.initState();
     _notificaciones = AppPreferences.notificationsEnabled;
     _sincronizacion = AppPreferences.offlineSyncEnabled;
-    _modoOscuro = AppPreferences.darkModeEnabled;
   }
 
   void _onTabSelected(AppTab tab) {
@@ -89,13 +87,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
             const SizedBox(height: 24),
 
-            _buildActivitySection(),
+            _buildActivitySection(context),
             const SizedBox(height: 24),
 
             BuildSettingSection(
               notificaciones: _notificaciones,
               sincronizacion: _sincronizacion,
-              modoOscuro: _modoOscuro,
               onNotificacionesChanged: (v) async {
                 await AppPreferences.setNotificationsEnabled(v);
                 setState(() => _notificaciones = v);
@@ -103,10 +100,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
               onSincronizacionChanged: (v) async {
                 await AppPreferences.setOfflineSyncEnabled(v);
                 setState(() => _sincronizacion = v);
-              },
-              onModoOscuroChanged: (v) async {
-                await AppPreferences.setDarkModeEnabled(v);
-                setState(() => _modoOscuro = v);
               },
             ),
             const SizedBox(height: 24),
@@ -133,13 +126,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
     );
   }
 
-  Widget _buildActivitySection() {
+  Widget _buildActivitySection(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withAlpha(50)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -153,39 +148,39 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryBlueSoft,
+                    color: colors.primaryBlueSoft,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.assignment_ind_outlined, 
-                    color: AppColors.primaryBlue, 
-                    size: 22
+                    color: colors.primaryBlue, 
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Mis Publicaciones',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                       Text(
                         'Ver eventos reportados por ti',
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
+                Icon(Icons.arrow_forward_ios, size: 14, color: colors.textSecondary),
               ],
             ),
           ),

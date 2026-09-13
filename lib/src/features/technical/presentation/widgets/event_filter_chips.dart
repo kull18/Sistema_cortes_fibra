@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 enum EventFilter { todos, activos, atendidos }
 
@@ -19,26 +19,28 @@ class EventFilterChips extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _chip('Todos', EventFilter.todos),
+          _chip(context, 'Todos', EventFilter.todos),
           const SizedBox(width: 8),
-          _chip('Activos', EventFilter.activos),
+          _chip(context, 'Activos', EventFilter.activos),
           const SizedBox(width: 8),
-          _chip('Atendidos', EventFilter.atendidos),
+          _chip(context, 'Atendidos', EventFilter.atendidos),
         ],
       ),
     );
   }
 
-  Widget _chip(String label, EventFilter value) {
+  Widget _chip(BuildContext context, String label, EventFilter value) {
+    final colors = context.colors;
     final isSelected = selected == value;
+
     return GestureDetector(
       onTap: () => onChanged(value),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryBlue : Colors.white,
+          color: isSelected ? colors.primaryBlue : colors.surface,
           border: Border.all(
-            color: isSelected ? AppColors.primaryBlue : AppColors.borderSubtle,
+            color: isSelected ? colors.primaryBlue : colors.borderSubtle,
           ),
           borderRadius: BorderRadius.circular(999),
         ),
@@ -47,7 +49,7 @@ class EventFilterChips extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : AppColors.textPrimary,
+            color: isSelected ? Colors.white : colors.textPrimary,
           ),
         ),
       ),
