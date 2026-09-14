@@ -1,5 +1,5 @@
 /// Contrato abstracto de todos los endpoints de la API de SCF.
-/// Cada metodo retorna un Map<String, dynamic> (el JSON decodificado).
+/// Cada metodo retorna un `Map<String, dynamic>` (el JSON decodificado).
 /// Cuando el endpoint responde una lista, viene envuelta como {'data': [...]}.
 abstract class IApi {
   // ---------------------------------------------------------------------
