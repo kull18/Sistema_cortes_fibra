@@ -52,13 +52,13 @@ jobs:
       - name: Build App Bundle
         run: flutter build appbundle --release --dart-define-from-file=env/production.json
 
-      - name: Upload to Play Store (Internal Testing)
+      - name: Upload to Play Store (Closed Testing)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.scf.sistema_cortes_fibra
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: internal
+          track: alpha
           status: completed
 
       - name: Clean up sensitive files
