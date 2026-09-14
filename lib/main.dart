@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_cortes_fibra/my_app.dart';
 import 'package:sistema_cortes_fibra/src/core/api/api_service.dart';
@@ -8,6 +9,7 @@ import 'package:sistema_cortes_fibra/src/core/deeplink/deep_link_service.dart';
 import 'package:sistema_cortes_fibra/src/core/di/app_container.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/app_preferences.dart';
 import 'package:sistema_cortes_fibra/src/core/preferences/user_preferences.dart';
+import 'package:sistema_cortes_fibra/src/core/theme/theme_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/auth/di/auth_module.dart';
 import 'package:sistema_cortes_fibra/src/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/di/technical_module.dart';
@@ -21,6 +23,22 @@ import 'package:sistema_cortes_fibra/src/features/technical/presentation/provide
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 bool _isHandling401 = false;
+
+const String _oneSignalAppId = String.fromEnvironment(
+  'ONESIGNAL_APP_ID',
+  defaultValue: 'YOUR_ONESIGNAL_APP_ID_HERE',
+);
+
+void _initOneSignal() {
+  if (_oneSignalAppId.isNotEmpty && _oneSignalAppId != 'YOUR_ONESIGNAL_APP_ID_HERE') {
+    debugPrint('DEBUG [OneSignal] Inicializando OneSignal con App ID: $_oneSignalAppId');
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.initialize(_oneSignalAppId);
+    OneSignal.Notifications.requestPermission(true);
+  } else {
+    debugPrint('DEBUG [OneSignal] Advertencia: ONESIGNAL_APP_ID no configurado en env.');
+  }
+}
 
 void _handleUnauthorized(AppContainer container) async {
   if (_isHandling401) return;
@@ -59,8 +77,11 @@ void _handleUnauthorized(AppContainer container) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 1. Inicializar Preferencias
+  // 1. Inicializar Preferencias, Tema y OneSignal
   await AppPreferences.init();
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadSavedTheme();
+  _initOneSignal();
 
   // 2. Inicializar Contenedor de Dependencias
   final container = AppContainer();
@@ -88,6 +109,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<ThemeProvider>.value(
+          value: themeProvider,
+        ),
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
             loginUseCase: authModule.provideLoginUseCase(),

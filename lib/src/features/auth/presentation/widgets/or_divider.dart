@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class OrDivider extends StatelessWidget {
   final String label;
@@ -9,27 +8,29 @@ class OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         children: [
-          const Expanded(
-            child: Divider(color: AppColors.borderSubtle),
+          Expanded(
+            child: Divider(color: colors.borderSubtle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               label.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
                 letterSpacing: 1,
               ),
             ),
           ),
-          const Expanded(
-            child: Divider(color: AppColors.borderSubtle),
+          Expanded(
+            child: Divider(color: colors.borderSubtle),
           ),
         ],
       ),

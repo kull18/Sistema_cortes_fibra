@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class LogoutButton extends StatelessWidget {
   final VoidCallback onLogout;
@@ -8,23 +8,25 @@ class LogoutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ElevatedButton(
         onPressed: onLogout,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.statusRed.withOpacity(0.08),
-          foregroundColor: AppColors.statusRed,
+          backgroundColor: colors.statusRed.withValues(alpha: 0.08),
+          foregroundColor: colors.statusRed,
           elevation: 0,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: AppColors.statusRed, width: 0.5),
+            side: BorderSide(color: colors.statusRed, width: 0.5),
           ),
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.logout, size: 18),
             SizedBox(width: 10),
             Text(

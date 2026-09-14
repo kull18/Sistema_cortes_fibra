@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
 import 'app_header_actions.dart';
 
 /// Header compartido por todas las screens autenticadas del área técnica.
@@ -30,10 +30,12 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return SafeArea(
       bottom: false,
       child: Container(
-        color: AppColors.background,
+        color: colors.background,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
@@ -41,7 +43,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primaryBlueSoft,
+                color: colors.primaryBlueSoft,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -49,8 +51,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                   'assets/icons/ic_network_node.svg',
                   width: 22,
                   height: 22,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.primaryBlue,
+                  colorFilter: ColorFilter.mode(
+                    colors.primaryBlue,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -64,18 +66,18 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Text(
                     appTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                   if (subtitle != null)
                     Text(
                       subtitle!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                 ],

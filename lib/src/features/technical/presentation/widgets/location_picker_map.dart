@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../core/responsive/responsive_extensions.dart';
+import '../../../../core/theme/dark_map_style.dart';
 
 class LocationPickerMap extends StatefulWidget {
   final LatLng initialPosition;
@@ -46,6 +47,7 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final mapHeight = context.responsiveValue<double>(
       small: 180.0,
       medium: 220.0,
@@ -58,6 +60,7 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
         height: mapHeight,
         width: double.infinity,
         child: GoogleMap(
+          style: isDark ? darkMapStyle : null,
           initialCameraPosition: CameraPosition(
             target: widget.initialPosition,
             zoom: 15,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../app_colors.dart';
+import '../theme/theme_extensions.dart';
 import 'app_header_actions.dart';
 
 /// Header con botón de regreso + título, compartido por todas las screens
@@ -34,8 +34,10 @@ class DetailTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
-      color: AppColors.background,
+      color: colors.background,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
         children: [
@@ -45,7 +47,7 @@ class DetailTopBar extends StatelessWidget implements PreferredSizeWidget {
               'assets/icons/ic_arrow_left.svg',
               width: 24,
               height: 24,
-              colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
             ),
           ),
           Expanded(
@@ -55,19 +57,19 @@ class DetailTopBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

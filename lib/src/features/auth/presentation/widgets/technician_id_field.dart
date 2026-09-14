@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class TechnicianIdField extends StatelessWidget {
   final TextEditingController controller;
@@ -10,18 +9,20 @@ class TechnicianIdField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
+          children: [
             Text(
               'Ficha de Técnico',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
               ),
             ),
             Text(
@@ -30,7 +31,7 @@ class TechnicianIdField extends StatelessWidget {
                 fontFamily: 'JetBrainsMono',
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
             ),
           ],
@@ -38,9 +39,9 @@ class TechnicianIdField extends StatelessWidget {
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderStrong),
+            border: Border.all(color: colors.borderStrong),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
@@ -49,8 +50,8 @@ class TechnicianIdField extends StatelessWidget {
                 'assets/icons/ic_user.svg',
                 width: 18,
                 height: 18,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.textSecondary,
+                colorFilter: ColorFilter.mode(
+                  colors.textSecondary,
                   BlendMode.srcIn,
                 ),
               ),
@@ -58,21 +59,21 @@ class TechnicianIdField extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'FT-8942',
                     hintStyle: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                     ),
                     border: InputBorder.none,
                     isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ),

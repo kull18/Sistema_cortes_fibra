@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/responsive/responsive_extensions.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class EventDetailPhotosSection extends StatelessWidget {
   final List<Map<String, dynamic>> photos;
@@ -10,6 +10,7 @@ class EventDetailPhotosSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final gridAspectRatio = context.responsiveValue<double>(
       small: 1.0,
       medium: 1.1,
@@ -19,9 +20,9 @@ class EventDetailPhotosSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.3)),
+        border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,15 +32,15 @@ class EventDetailPhotosSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlueSoft,
+                  color: colors.primaryBlueSoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: SvgPicture.asset(
                   'assets/icons/ic_camera.svg',
                   width: 20,
                   height: 20,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.primaryBlue,
+                  colorFilter: ColorFilter.mode(
+                    colors.primaryBlue,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -49,19 +50,19 @@ class EventDetailPhotosSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Evidencias Fotográficas',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     Text(
                       '${photos.length} fotografía${photos.length == 1 ? '' : 's'} adjunta${photos.length == 1 ? '' : 's'}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ],
@@ -75,19 +76,19 @@ class EventDetailPhotosSection extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FA),
+                color: colors.surfaceMuted,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.2)),
+                border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.2)),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Icon(Icons.photo_library_outlined, size: 32, color: AppColors.placeholder),
-                  SizedBox(height: 8),
+                  Icon(Icons.photo_library_outlined, size: 32, color: colors.placeholder),
+                  const SizedBox(height: 8),
                   Text(
                     'No hay evidencias fotográficas en este evento.',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
@@ -119,9 +120,9 @@ class EventDetailPhotosSection extends StatelessWidget {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8F9FA),
+                      color: colors.surfaceMuted,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.3)),
+                      border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Stack(
@@ -131,9 +132,9 @@ class EventDetailPhotosSection extends StatelessWidget {
                             ? Image.network(
                                 photoUrl,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => _buildPlaceholder(label),
+                                errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context, label),
                               )
-                            : _buildPlaceholder(label),
+                            : _buildPlaceholder(context, label),
                         Positioned(
                           bottom: 0,
                           left: 0,
@@ -170,9 +171,11 @@ class EventDetailPhotosSection extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder(String label) {
+  Widget _buildPlaceholder(BuildContext context, String label) {
+    final colors = context.colors;
+
     return Container(
-      color: AppColors.primaryBlueSoft,
+      color: colors.primaryBlueSoft,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -181,8 +184,8 @@ class EventDetailPhotosSection extends StatelessWidget {
               'assets/icons/ic_camera.svg',
               width: 28,
               height: 28,
-              colorFilter: const ColorFilter.mode(
-                AppColors.primaryBlue,
+              colorFilter: ColorFilter.mode(
+                colors.primaryBlue,
                 BlendMode.srcIn,
               ),
             ),
@@ -191,10 +194,10 @@ class EventDetailPhotosSection extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlue,
+                  color: colors.primaryBlue,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,

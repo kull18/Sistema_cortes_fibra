@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class AddTechnicalNoteModal extends StatefulWidget {
   final String eventId;
@@ -44,12 +44,14 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.primaryBlue, width: 1.6),
+        border: Border.all(color: colors.primaryBlue, width: 1.6),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -57,13 +59,13 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
           // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            color: const Color(0xFFEBF5FF),
+            color: colors.primaryBlueSoft,
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryBlue,
+                    color: colors.primaryBlue,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -77,19 +79,19 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Agregar Nota Técnica',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                       Text(
                         'Registro de campo oficial para bitácora NOC',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary.withOpacity(0.8),
+                          color: colors.textSecondary.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -98,12 +100,12 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                 ),
                 IconButton(
                   onPressed: _isSaving ? null : () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                  icon: Icon(Icons.close, color: colors.textSecondary, size: 20),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: Color(0xFFD1E9FF)),
+          Divider(height: 1, thickness: 1, color: colors.borderSubtle),
           // Content
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
@@ -114,9 +116,9 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
+                    color: colors.surfaceMuted,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+                    border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
@@ -126,7 +128,7 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE2E8F0),
+                              color: colors.borderSubtle,
                               shape: BoxShape.circle,
                               image: widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty
                                   ? DecorationImage(
@@ -146,8 +148,8 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
-                                color: AppColors.onlineGreen,
-                                border: Border.all(color: Colors.white, width: 2),
+                                color: colors.onlineGreen,
+                                border: Border.all(color: colors.surface, width: 2),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -160,17 +162,17 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                         children: [
                           Text(
                             widget.userName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 14,
-                              color: AppColors.textPrimary,
+                              color: colors.textPrimary,
                             ),
                           ),
                           Text(
                             'Ficha: ${widget.technicianCode}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: colors.textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -183,19 +185,19 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Comentario *',
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 14,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     Text(
                       '$_charCount / 1000',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -208,22 +210,23 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                   maxLength: 1000,
                   enabled: !_isSaving,
                   buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
+                  style: TextStyle(color: colors.textPrimary),
                   decoration: InputDecoration(
                     hintText: 'Describe el avance o situación en campo...',
-                    hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5), fontSize: 14),
+                    hintStyle: TextStyle(color: colors.textSecondary.withValues(alpha: 0.5), fontSize: 14),
                     filled: true,
-                    fillColor: const Color(0xFFF8F9FA),
+                    fillColor: colors.surfaceMuted,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: AppColors.borderSubtle.withOpacity(0.2)),
+                      borderSide: BorderSide(color: colors.borderSubtle.withValues(alpha: 0.2)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: AppColors.borderSubtle.withOpacity(0.2)),
+                      borderSide: BorderSide(color: colors.borderSubtle.withValues(alpha: 0.2)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.5),
+                      borderSide: BorderSide(color: colors.primaryBlue, width: 1.5),
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
@@ -240,7 +243,7 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue,
+                    backgroundColor: colors.primaryBlue,
                     foregroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 56),
                     shape: RoundedRectangleBorder(
@@ -277,22 +280,22 @@ class _AddTechnicalNoteModalState extends State<AddTechnicalNoteModal> {
                   onPressed: _isSaving ? null : () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
-                    side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3)),
+                    side: BorderSide(color: colors.borderSubtle.withValues(alpha: 0.3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.close, size: 20, color: AppColors.textSecondary),
-                      SizedBox(width: 10),
+                      Icon(Icons.close, size: 20, color: colors.textSecondary),
+                      const SizedBox(width: 10),
                       Text(
                         'Cancelar',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                     ],

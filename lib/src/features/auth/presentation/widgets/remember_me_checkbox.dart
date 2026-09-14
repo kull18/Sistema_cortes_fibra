@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class RememberMeCheckbox extends StatelessWidget {
   final bool value;
@@ -14,6 +13,8 @@ class RememberMeCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return GestureDetector(
       onTap: () => onChanged(!value),
       behavior: HitTestBehavior.opaque,
@@ -25,8 +26,8 @@ class RememberMeCheckbox extends StatelessWidget {
             child: Checkbox(
               value: value,
               onChanged: (v) => onChanged(v ?? false),
-              activeColor: AppColors.primaryBlue,
-              side: const BorderSide(color: AppColors.borderStrong),
+              activeColor: colors.primaryBlue,
+              side: BorderSide(color: colors.borderStrong),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -34,12 +35,12 @@ class RememberMeCheckbox extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          const Text(
+          Text(
             'Recordar mi ID en este dispositivo',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
         ],

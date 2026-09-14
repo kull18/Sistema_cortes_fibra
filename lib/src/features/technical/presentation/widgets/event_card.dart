@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/app_color_scheme.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../domain/entities/fiber_event.dart';
 import 'event_status_chip.dart';
 
@@ -14,28 +15,30 @@ class EventCard extends StatelessWidget {
     required this.onVerDetalle,
   });
 
-  Color get _borderColor {
+  Color _borderColor(AppColorScheme colors) {
     switch (event.status) {
       case FiberEventStatus.activo:
-        return AppColors.statusRed;
+        return colors.statusRed;
       case FiberEventStatus.atendido:
-        return AppColors.statusGreen;
+        return colors.statusGreen;
       case FiberEventStatus.cerrado:
-        return AppColors.textSecondary;
+        return colors.textSecondary;
       case FiberEventStatus.pendiente:
-        return AppColors.statusAmber;
+        return colors.statusAmber;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border(left: BorderSide(color: _borderColor, width: 4)),
-        boxShadow: const [
-          BoxShadow(color: AppColors.cardShadow, blurRadius: 2, offset: Offset(0, 1)),
+        border: Border(left: BorderSide(color: _borderColor(colors), width: 4)),
+        boxShadow: [
+          BoxShadow(color: colors.shadow, blurRadius: 2, offset: const Offset(0, 1)),
         ],
       ),
       padding: const EdgeInsets.all(16),
@@ -47,10 +50,10 @@ class EventCard extends StatelessWidget {
             children: [
               Text(
                 event.id,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlue,
+                  color: colors.primaryBlue,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -64,8 +67,8 @@ class EventCard extends StatelessWidget {
                 'assets/icons/ic_compass.svg',
                 width: 14,
                 height: 14,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.primaryBlue,
+                colorFilter: ColorFilter.mode(
+                  colors.primaryBlue,
                   BlendMode.srcIn,
                 ),
               ),
@@ -73,10 +76,10 @@ class EventCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   'Tramo ${event.originPrefix} \u2192 ${event.destinationPrefix}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primaryBlue,
+                    color: colors.primaryBlue,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -84,7 +87,7 @@ class EventCard extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 '(${event.kmReference})',
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 12, color: colors.textSecondary),
               ),
             ],
           ),
@@ -92,8 +95,8 @@ class EventCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
-              border: Border.all(color: AppColors.borderSubtle.withValues(alpha: 0.5)),
+              color: colors.surfaceMuted,
+              border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.5)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -108,8 +111,8 @@ class EventCard extends StatelessWidget {
                         'assets/icons/ic_file.svg',
                         width: 14,
                         height: 14,
-                        colorFilter: const ColorFilter.mode(
-                          AppColors.primaryBlue,
+                        colorFilter: ColorFilter.mode(
+                          colors.primaryBlue,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -118,10 +121,10 @@ class EventCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         event.description.isNotEmpty ? event.description : 'Sin descripción',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                           height: 1.3,
                         ),
                         maxLines: 2,
@@ -133,8 +136,8 @@ class EventCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.only(top: 8),
-                  decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: AppColors.borderSubtle)),
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: colors.borderSubtle)),
                   ),
                   child: Row(
                     children: [
@@ -142,15 +145,15 @@ class EventCard extends StatelessWidget {
                         'assets/icons/ic_clock.svg',
                         width: 12,
                         height: 12,
-                        colorFilter: const ColorFilter.mode(
-                          AppColors.textSecondary,
+                        colorFilter: ColorFilter.mode(
+                          colors.textSecondary,
                           BlendMode.srcIn,
                         ),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         event.timeLabel,
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 11, color: colors.textSecondary),
                       ),
                     ],
                   ),
@@ -162,10 +165,10 @@ class EventCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Tocar para abrir diagnóstico',
-                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: colors.textSecondary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -174,12 +177,12 @@ class EventCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       'Ver Detalle',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryBlue,
+                        color: colors.primaryBlue,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -187,8 +190,8 @@ class EventCard extends StatelessWidget {
                       'assets/icons/ic_arrow_right.svg',
                       width: 14,
                       height: 14,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primaryBlue,
+                      colorFilter: ColorFilter.mode(
+                        colors.primaryBlue,
                         BlendMode.srcIn,
                       ),
                     ),

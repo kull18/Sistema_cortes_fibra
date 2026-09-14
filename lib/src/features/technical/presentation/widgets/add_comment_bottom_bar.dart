@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class AddCommentBottomBar extends StatelessWidget {
   final VoidCallback onAddComment;
@@ -8,13 +8,15 @@ class AddCommentBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: colors.shadow,
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
@@ -23,7 +25,7 @@ class AddCommentBottomBar extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onAddComment,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryBlue,
+          backgroundColor: colors.primaryBlue,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 54),
           shape: RoundedRectangleBorder(
@@ -31,9 +33,9 @@ class AddCommentBottomBar extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.chat_bubble_outline, size: 20),
             SizedBox(width: 10),
             Text(

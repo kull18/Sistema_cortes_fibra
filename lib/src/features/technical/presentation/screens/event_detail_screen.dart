@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sistema_cortes_fibra/src/core/app_colors.dart';
 import 'package:sistema_cortes_fibra/src/core/app_routes.dart';
+import 'package:sistema_cortes_fibra/src/core/theme/theme_extensions.dart';
 import 'package:sistema_cortes_fibra/src/features/technical/domain/entities/fiber_event.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
@@ -106,9 +106,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   Widget _buildErrorView(BuildContext context, String errorMessage) {
+    final colors = context.colors;
     final isUnauthorized = errorMessage.contains('Inicia sesión');
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('Detalle de Evento', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         leading: IconButton(
@@ -125,16 +127,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               Icon(
                 isUnauthorized ? Icons.lock_outline : Icons.error_outline,
                 size: 64,
-                color: isUnauthorized ? AppColors.primaryBlue : AppColors.statusRed,
+                color: isUnauthorized ? colors.primaryBlue : colors.statusRed,
               ),
               const SizedBox(height: 16),
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -150,7 +152,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryBlue,
+                  backgroundColor: colors.primaryBlue,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

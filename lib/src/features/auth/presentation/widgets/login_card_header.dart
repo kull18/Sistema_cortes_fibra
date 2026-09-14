@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class LoginCardHeader extends StatelessWidget {
   final String title;
@@ -15,12 +14,14 @@ class LoginCardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: AppColors.cardHeaderBg,
+      decoration: BoxDecoration(
+        color: colors.cardHeaderBg,
         border: Border(
-          bottom: BorderSide(color: AppColors.borderSubtle),
+          bottom: BorderSide(color: colors.borderSubtle),
         ),
       ),
       child: Row(
@@ -32,19 +33,19 @@ class LoginCardHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -54,7 +55,7 @@ class LoginCardHeader extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.primaryBlueSoft,
+              color: colors.primaryBlueSoft,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -62,8 +63,8 @@ class LoginCardHeader extends StatelessWidget {
                 'assets/icons/ic_shield.svg',
                 width: 20,
                 height: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.primaryBlue,
+                colorFilter: ColorFilter.mode(
+                  colors.primaryBlue,
                   BlendMode.srcIn,
                 ),
               ),
