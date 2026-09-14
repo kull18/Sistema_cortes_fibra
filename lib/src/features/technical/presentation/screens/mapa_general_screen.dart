@@ -23,8 +23,6 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
   bool _showCortes = true;
   bool _isSatellite = false;
 
-  GoogleMapController? _mapController;
-
   FiberEvent? _selectedEvent;
 
   static const CameraPosition _initialPosition = CameraPosition(
@@ -323,7 +321,6 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
         child: GoogleMap(
           initialCameraPosition: _initialPosition,
           mapType: _isSatellite ? MapType.satellite : MapType.normal,
-          onMapCreated: (controller) => _mapController = controller,
           markers: _buildMarkers(home, office),
           myLocationEnabled: true,
           myLocationButtonEnabled: false,
