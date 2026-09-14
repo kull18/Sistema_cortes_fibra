@@ -58,7 +58,7 @@ void _handleUnauthorized(AppContainer container) async {
     );
 
     final context = navigatorKey.currentContext;
-    if (context != null) {
+    if (context != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'),

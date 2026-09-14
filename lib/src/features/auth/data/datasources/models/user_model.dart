@@ -39,7 +39,6 @@ class UserModel extends UserEntity {
     );
   }
 
-  @override
   Map<String, dynamic> toJson() {
     return {
       'access_token': accessToken,
