@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+
 import '../../../../core/app_colors.dart';
-import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/location/location_service.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
+import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
-import '../providers/central_office_provider.dart';
 import '../../domain/entities/central_office_entity.dart';
+import '../../domain/entities/location_mode.dart';
+import '../providers/central_office_provider.dart';
+import '../widgets/location_mode_toggle.dart';
+import '../widgets/location_picker_map.dart';
 
 class RegistrarCentralScreen extends StatefulWidget {
   const RegistrarCentralScreen({super.key});
@@ -25,9 +31,22 @@ class _RegistrarCentralScreenState extends State<RegistrarCentralScreen> {
 
   double _latitude = 16.7528;
   double _longitude = -93.1165;
+  double? _gpsAccuracy;
+  LocationMode _locationMode = LocationMode.gps;
+  final LocationService _locationService = LocationService();
 
   CentralOfficeEntity? _editingOffice;
   bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_editingOffice == null) {
+        _useCurrentLocation();
+      }
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -41,6 +60,7 @@ class _RegistrarCentralScreenState extends State<RegistrarCentralScreen> {
         _ciudadController.text = args.city;
         _latitude = args.latitude;
         _longitude = args.longitude;
+        _locationMode = LocationMode.manual;
       }
       _isInitialized = true;
     }
@@ -54,6 +74,35 @@ class _RegistrarCentralScreenState extends State<RegistrarCentralScreen> {
     _direccionController.dispose();
     _observacionesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _useCurrentLocation() async {
+    try {
+      final position = await _locationService.getCurrentPosition();
+      if (mounted) {
+        setState(() {
+          _latitude = position.latitude;
+          _longitude = position.longitude;
+          _gpsAccuracy = position.accuracy;
+          _locationMode = LocationMode.gps;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  void _handleLocationChanged(LatLng position) {
+    setState(() {
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+      _gpsAccuracy = null;
+      _locationMode = LocationMode.manual;
+    });
   }
 
   void _onTabSelected(AppTab tab) {
@@ -210,21 +259,16 @@ class _RegistrarCentralScreenState extends State<RegistrarCentralScreen> {
             ),
             const SizedBox(height: 24),
 
-            // GPS Coords
+            // GPS & Map Selection Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Coordenadas GPS de Referencia',
+                  'Ubicación GPS de la Central',
                   style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: AppColors.textPrimary),
                 ),
                 TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _latitude = 16.7528;
-                      _longitude = -93.1165;
-                    });
-                  },
+                  onPressed: _useCurrentLocation,
                   icon: const Icon(Icons.gps_fixed, size: 16),
                   label: const Text('Capturar GPS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   style: TextButton.styleFrom(foregroundColor: AppColors.primaryBlue),
@@ -232,17 +276,41 @@ class _RegistrarCentralScreenState extends State<RegistrarCentralScreen> {
               ],
             ),
             const SizedBox(height: 8),
+            LocationModeToggle(
+              selected: _locationMode,
+              onChanged: (mode) => setState(() => _locationMode = mode),
+            ),
+            const SizedBox(height: 12),
+            LocationPickerMap(
+              initialPosition: LatLng(_latitude, _longitude),
+              onLocationChanged: _handleLocationChanged,
+            ),
+            const SizedBox(height: 8),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
               ),
-              child: Text(
-                '${_latitude.toStringAsFixed(4)}° N, ${_longitude.toStringAsFixed(4)}° W',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_latitude.toStringAsFixed(4)}° N, ${_longitude.toStringAsFixed(4)}° W',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                  ),
+                  if (_gpsAccuracy != null)
+                    Text(
+                      'Precisión: ±${_gpsAccuracy!.toStringAsFixed(1)}m',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
               ),
             ),
             const SizedBox(height: 32),

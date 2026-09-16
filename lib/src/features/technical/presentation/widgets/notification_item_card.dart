@@ -81,7 +81,7 @@ class NotificationItemCard extends StatelessWidget {
                     Icon(Icons.access_time, size: 14, color: colors.textSecondary.withValues(alpha: 0.7)),
                     const SizedBox(width: 4),
                     Text(
-                      time,
+                      time.startsWith('Fecha:') ? time : 'Fecha: $time',
                       style: TextStyle(
                         fontSize: 12,
                         color: colors.textSecondary.withValues(alpha: 0.7),

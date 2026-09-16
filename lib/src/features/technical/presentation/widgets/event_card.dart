@@ -84,11 +84,6 @@ class EventCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 4),
-              Text(
-                '(${event.kmReference})',
-                style: TextStyle(fontSize: 12, color: colors.textSecondary),
-              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -120,7 +115,7 @@ class EventCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        event.description.isNotEmpty ? event.description : 'Sin descripción',
+                        'Descripción: ${event.description.isNotEmpty ? event.description : 'Sin descripción'}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -152,7 +147,7 @@ class EventCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        event.timeLabel,
+                        'Fecha: ${event.timeLabel}',
                         style: TextStyle(fontSize: 11, color: colors.textSecondary),
                       ),
                     ],

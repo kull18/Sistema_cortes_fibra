@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class QuickAccessButton extends StatelessWidget {
   final String iconPath;
@@ -16,8 +16,10 @@ class QuickAccessButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Material(
-      color: Colors.white,
+      color: colors.surface,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -25,7 +27,7 @@ class QuickAccessButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.borderSubtle),
+            border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -35,8 +37,8 @@ class QuickAccessButton extends StatelessWidget {
                 iconPath,
                 width: 20,
                 height: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.primaryBlue,
+                colorFilter: ColorFilter.mode(
+                  colors.primaryBlue,
                   BlendMode.srcIn,
                 ),
               ),
@@ -44,10 +46,10 @@ class QuickAccessButton extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
             ],

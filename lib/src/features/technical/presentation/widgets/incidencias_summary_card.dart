@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 
 class IncidenciasSummaryCard extends StatelessWidget {
   final int total;
@@ -16,17 +16,19 @@ class IncidenciasSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
-        boxShadow: const [
+        border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
+            color: colors.shadow,
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -39,14 +41,14 @@ class IncidenciasSummaryCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlue.withOpacity(0.1),
+                  color: colors.primaryBlueSoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
                   child: SvgPicture.asset(
                     'assets/icons/ic_vital_signs.svg',
                     width: 22,
-                    colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                   ),
                 ),
               ),
@@ -55,20 +57,20 @@ class IncidenciasSummaryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Bitácora de Incidencias',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Red de Fibra Óptica · TGZ · SCH · SCL',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -81,19 +83,22 @@ class IncidenciasSummaryCard extends StatelessWidget {
           Row(
             children: [
               _buildStatItem(
+                context: context,
                 label: 'TOTAL',
                 value: total.toString(),
                 isSelected: true,
               ),
               const SizedBox(width: 12),
               _buildStatItem(
+                context: context,
                 label: 'ACTIVOS',
                 value: activos.toString(),
                 isSelected: false,
-                valueColor: AppColors.statusRed,
+                valueColor: colors.statusRed,
               ),
               const SizedBox(width: 12),
               _buildStatItem(
+                context: context,
                 label: 'CERRADOS',
                 value: cerrados.toString(),
                 isSelected: false,
@@ -106,19 +111,22 @@ class IncidenciasSummaryCard extends StatelessWidget {
   }
 
   Widget _buildStatItem({
+    required BuildContext context,
     required String label,
     required String value,
     required bool isSelected,
     Color? valueColor,
   }) {
+    final colors = context.colors;
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryBlue.withOpacity(0.08) : const Color(0xFFF8F9FA),
+          color: isSelected ? colors.primaryBlueSoft : colors.surfaceMuted,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primaryBlue : AppColors.borderSubtle.withOpacity(0.3),
+            color: isSelected ? colors.primaryBlue : colors.borderSubtle.withOpacity(0.3),
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -129,7 +137,7 @@ class IncidenciasSummaryCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? AppColors.primaryBlue : AppColors.textSecondary,
+                color: isSelected ? colors.primaryBlue : colors.textSecondary,
                 letterSpacing: 0.5,
               ),
             ),
@@ -139,7 +147,7 @@ class IncidenciasSummaryCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: valueColor ?? AppColors.textPrimary,
+                color: valueColor ?? colors.textPrimary,
               ),
             ),
           ],
