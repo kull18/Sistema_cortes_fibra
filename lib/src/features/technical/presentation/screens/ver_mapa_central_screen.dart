@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +58,11 @@ class _VerMapaCentralScreenState extends State<VerMapaCentralScreen> {
         children: [
           // Google Map Full View
           GoogleMap(
+            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+              Factory<OneSequenceGestureRecognizer>(
+                () => EagerGestureRecognizer(),
+              ),
+            },
             initialCameraPosition: CameraPosition(
               target: pos,
               zoom: 16,

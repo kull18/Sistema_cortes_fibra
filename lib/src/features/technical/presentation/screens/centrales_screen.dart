@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
@@ -67,20 +67,26 @@ class _CentralesScreenState extends State<CentralesScreen> {
   }
 
   Future<void> _deleteOffice(CentralOfficeEntity office) async {
+    final colors = context.colors;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar Central'),
-        content: Text('¿Está seguro de que desea eliminar la central "${office.name}"? Esta acción no se puede deshacer.'),
+        backgroundColor: colors.surface,
+        title: Text('Eliminar Central', style: TextStyle(color: colors.textPrimary)),
+        content: Text(
+          '¿Está seguro de que desea eliminar la central "${office.name}"? Esta acción no se puede deshacer.',
+          style: TextStyle(color: colors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('CANCELAR'),
+            child: Text('CANCELAR', style: TextStyle(color: colors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('ELIMINAR'),
+            style: TextButton.styleFrom(foregroundColor: colors.statusRed),
+            child: Text('ELIMINAR', style: TextStyle(color: colors.statusRed)),
           ),
         ],
       ),
@@ -103,6 +109,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final authProvider = context.watch<AuthProvider>();
     final homeProvider = context.watch<HomeProvider>();
     final user = authProvider.user;
@@ -142,22 +149,22 @@ class _CentralesScreenState extends State<CentralesScreen> {
                   children: [
                     Skeletonizer(
                       enabled: showSkeleton,
-                      child: _buildSummaryCard(showSkeleton ? 0 : provider.offices.length),
+                      child: _buildSummaryCard(context, showSkeleton ? 0 : provider.offices.length),
                     ),
                     const SizedBox(height: 20),
-                    _buildSearchBar(),
+                    _buildSearchBar(context),
                     const SizedBox(height: 24),
                     if (provider.error != null && provider.offices.isEmpty)
-                      Center(child: Text(provider.error!))
+                      Center(child: Text(provider.error!, style: TextStyle(color: colors.statusRed)))
                     else ...[
                       Skeletonizer(
                         enabled: showSkeleton,
                         child: Text(
                           'Mostrando ${displayedOffices.length} de ${provider.offices.length} centrales',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: colors.textSecondary,
                           ),
                         ),
                       ),
@@ -165,7 +172,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                       Skeletonizer(
                         enabled: showSkeleton,
                         child: Column(
-                          children: displayedOffices.map((office) => _buildCentralCard(office)).toList(),
+                          children: displayedOffices.map((office) => _buildCentralCard(context, office)).toList(),
                         ),
                       ),
                     ],
@@ -179,7 +186,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                   onPressed: () {
                     Navigator.of(context).pushNamed(AppRoutes.registrarCentral);
                   },
-                  backgroundColor: AppColors.primaryBlue,
+                  backgroundColor: colors.primaryBlue,
                   elevation: 4,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -192,16 +199,18 @@ class _CentralesScreenState extends State<CentralesScreen> {
     );
   }
 
-  Widget _buildSummaryCard(int count) {
+  Widget _buildSummaryCard(BuildContext context, int count) {
+    final colors = context.colors;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+        border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: colors.shadow,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -215,13 +224,13 @@ class _CentralesScreenState extends State<CentralesScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlueSoft,
+                  color: colors.primaryBlueSoft,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: SvgPicture.asset(
                   'assets/icons/ic_building.svg',
                   width: 24,
-                  colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                 ),
               ),
               const SizedBox(width: 16),
@@ -229,12 +238,12 @@ class _CentralesScreenState extends State<CentralesScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Centrales de Fibra Óptica',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -242,7 +251,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                       'Red Troncal Activa',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary.withOpacity(0.8),
+                        color: colors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -256,28 +265,28 @@ class _CentralesScreenState extends State<CentralesScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: colors.surfaceMuted,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'CENTRALES ACTIVAS:',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                     letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$count Nodos',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
@@ -288,12 +297,14 @@ class _CentralesScreenState extends State<CentralesScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.3)),
+        border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
       ),
       child: TextField(
         onChanged: (value) {
@@ -301,10 +312,11 @@ class _CentralesScreenState extends State<CentralesScreen> {
             _searchQuery = value;
           });
         },
+        style: TextStyle(color: colors.textPrimary),
         decoration: InputDecoration(
           hintText: 'Buscar por prefijo, ciudad o nombre...',
-          hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.4), fontSize: 13),
-          prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+          hintStyle: TextStyle(color: colors.textSecondary, fontSize: 13),
+          prefixIcon: Icon(Icons.search, color: colors.textSecondary, size: 20),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
@@ -312,17 +324,19 @@ class _CentralesScreenState extends State<CentralesScreen> {
     );
   }
 
-  Widget _buildCentralCard(CentralOfficeEntity office) {
+  Widget _buildCentralCard(BuildContext context, CentralOfficeEntity office) {
+    final colors = context.colors;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+        border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: colors.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -337,20 +351,21 @@ class _CentralesScreenState extends State<CentralesScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBlueSoft,
+                  color: colors.primaryBlueSoft,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '[${office.prefix}]',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primaryBlue,
+                    color: colors.primaryBlue,
                   ),
                 ),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+                icon: Icon(Icons.more_vert, color: colors.textSecondary),
+                color: colors.surface,
                 onSelected: (value) {
                   if (value == 'ficha') {
                     Navigator.of(context).pushNamed(AppRoutes.fichaCentral, arguments: office);
@@ -361,33 +376,33 @@ class _CentralesScreenState extends State<CentralesScreen> {
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'ficha',
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, size: 18, color: AppColors.primaryBlue),
-                        SizedBox(width: 8),
-                        Text('Ver Ficha'),
+                        Icon(Icons.info_outline, size: 18, color: colors.primaryBlue),
+                        const SizedBox(width: 8),
+                        Text('Ver Ficha', style: TextStyle(color: colors.textPrimary)),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'mapa',
                     child: Row(
                       children: [
-                        Icon(Icons.map_outlined, size: 18, color: AppColors.primaryBlue),
-                        SizedBox(width: 8),
-                        Text('Ver en Mapa'),
+                        Icon(Icons.map_outlined, size: 18, color: colors.primaryBlue),
+                        const SizedBox(width: 8),
+                        Text('Ver en Mapa', style: TextStyle(color: colors.textPrimary)),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, size: 18, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Eliminar Central', style: TextStyle(color: Colors.red)),
+                        Icon(Icons.delete_outline, size: 18, color: colors.statusRed),
+                        const SizedBox(width: 8),
+                        Text('Eliminar Central', style: TextStyle(color: colors.statusRed)),
                       ],
                     ),
                   ),
@@ -398,18 +413,18 @@ class _CentralesScreenState extends State<CentralesScreen> {
           const SizedBox(height: 10),
           Text(
             office.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             office.city,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -418,29 +433,29 @@ class _CentralesScreenState extends State<CentralesScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
+              color: colors.surfaceMuted,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.1)),
+              border: Border.all(color: colors.borderSubtle.withOpacity(0.2)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'COORDENADAS GPS',
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                     letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${office.latitude.toStringAsFixed(4)}° N, ${office.longitude.toStringAsFixed(4)}° W',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
@@ -459,20 +474,20 @@ class _CentralesScreenState extends State<CentralesScreen> {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(color: AppColors.borderSubtle.withOpacity(0.3)),
+                    side: BorderSide(color: colors.borderSubtle.withOpacity(0.4)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.info_outline, size: 18, color: AppColors.primaryBlue),
-                      SizedBox(width: 8),
+                    children: [
+                      Icon(Icons.info_outline, size: 18, color: colors.primaryBlue),
+                      const SizedBox(width: 8),
                       Text(
                         'Ficha',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                     ],
@@ -484,7 +499,7 @@ class _CentralesScreenState extends State<CentralesScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    color: const Color(0xFFF1F5F9),
+                    color: colors.surfaceMuted,
                   ),
                   child: TextButton(
                     onPressed: () {
@@ -503,15 +518,15 @@ class _CentralesScreenState extends State<CentralesScreen> {
                         SvgPicture.asset(
                           'assets/icons/ic_map.svg',
                           width: 18,
-                          colorFilter: const ColorFilter.mode(AppColors.primaryBlue, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(colors.primaryBlue, BlendMode.srcIn),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Ver Mapa',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                       ],

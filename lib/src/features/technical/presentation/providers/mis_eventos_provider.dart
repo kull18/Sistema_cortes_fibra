@@ -40,6 +40,7 @@ class MisEventosProvider extends ChangeNotifier {
       String? status;
       if (_selectedFilter == EventFilter.activos) status = 'ACTIVE';
       if (_selectedFilter == EventFilter.atendidos) status = 'RESOLVED';
+      if (_selectedFilter == EventFilter.cerrados) status = 'CLOSED';
 
       _events = await getEventsUseCase(status: status, reportedBy: 'me');
       _errorMessage = null;

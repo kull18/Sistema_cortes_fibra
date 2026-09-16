@@ -27,6 +27,8 @@ class EventsSection extends StatelessWidget {
         return events.where((e) => e.status == FiberEventStatus.activo).toList();
       case EventFilter.atendidos:
         return events.where((e) => e.status == FiberEventStatus.atendido).toList();
+      case EventFilter.cerrados:
+        return events.where((e) => e.status == FiberEventStatus.cerrado).toList();
       case EventFilter.todos:
         return events;
     }

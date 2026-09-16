@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme_extensions.dart';
 
-enum EventFilter { todos, activos, atendidos }
+enum EventFilter { todos, activos, atendidos, cerrados }
 
 class EventFilterChips extends StatelessWidget {
   final EventFilter selected;
@@ -24,6 +24,8 @@ class EventFilterChips extends StatelessWidget {
           _chip(context, 'Activos', EventFilter.activos),
           const SizedBox(width: 8),
           _chip(context, 'Atendidos', EventFilter.atendidos),
+          const SizedBox(width: 8),
+          _chip(context, 'Cerrados', EventFilter.cerrados),
         ],
       ),
     );
