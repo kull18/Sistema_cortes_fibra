@@ -135,34 +135,6 @@ class NetworkSegmentSection extends StatelessWidget {
             accentColor: const Color(0xFF00ACC1),
             onSelected: onDestinationSelected,
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.5)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Distancia Total Estimada:',
-                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                ),
-                Text(
-                  estimatedDistanceKm != null
-                      ? '${estimatedDistanceKm!.toStringAsFixed(1)} km'
-                      : '\u2014',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryBlue,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
