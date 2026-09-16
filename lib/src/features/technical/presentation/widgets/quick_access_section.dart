@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/app_colors.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import 'quick_access_button.dart';
 
 class QuickAccessSection extends StatelessWidget {
@@ -20,18 +20,20 @@ class QuickAccessSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'ACCESOS RÁPIDOS',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ),
           const SizedBox(height: 12),
@@ -45,7 +47,6 @@ class QuickAccessSection extends StatelessWidget {
                   onTap: onMapaGeneral,
                 ),
               ),
-              // Solo mostramos el separador y el segundo botón si showCentrales es true
               if (showCentrales) ...[
                 const SizedBox(width: 10),
                 Expanded(

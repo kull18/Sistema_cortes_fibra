@@ -37,6 +37,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     super.dispose();
   }
 
+  String _formatEventId(int eventId, DateTime date) {
+    return 'EV-${date.year}-${eventId.toString().padLeft(3, '0')}';
+  }
+
   void _onNotificationTap(NotificationEntity notification) {
     if (!notification.isRead) {
       context.read<NotificationsProvider>().markAsRead(notification.id);
@@ -47,7 +51,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       Navigator.of(context).pushNamed(
         AppRoutes.eventDetail,
         arguments: FiberEvent(
-          id: 'EV-${notification.relatedEventId}',
+          id: _formatEventId(notification.relatedEventId!, notification.createdAt),
+          rawId: notification.relatedEventId,
           title: '',
           description: '',
           originPrefix: '',
@@ -78,10 +83,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min';
-    if (diff.inHours < 24) return '${diff.inHours} h';
-    if (diff.inDays == 1) return 'Ayer';
-    return '${date.day}/${date.month}';
+    if (diff.inMinutes < 60) {
+      final mins = diff.inMinutes < 0 ? 0 : diff.inMinutes;
+      return 'Hace $mins min';
+    }
+    if (diff.inHours < 24) {
+      return 'Hace ${diff.inHours} hora${diff.inHours > 1 ? 's' : ''}';
+    }
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   @override
@@ -94,8 +103,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Consumer<NotificationsProvider>(
       builder: (context, provider, child) {
         final filteredNotifications = provider.notifications.where((n) {
-          final query = _searchController.text.toLowerCase();
-          final matchesSearch = n.title.toLowerCase().contains(query) ||
+          final query = _searchController.text.toLowerCase().trim();
+          final formattedId = n.relatedEventId != null
+              ? _formatEventId(n.relatedEventId!, n.createdAt).toLowerCase()
+              : 'not-${n.id}';
+          final simpleId = n.relatedEventId != null ? 'ev-${n.relatedEventId}' : '';
+
+          final matchesSearch = query.isEmpty ||
+              formattedId.contains(query) ||
+              simpleId.contains(query) ||
+              (n.relatedEventId?.toString() ?? '').contains(query) ||
+              n.title.toLowerCase().contains(query) ||
               n.body.toLowerCase().contains(query);
 
           if (!matchesSearch) return false;
@@ -134,13 +152,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: colors.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            'Avisos y Telemetría NOC',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: colors.textSecondary,
                             ),
                           ),
                         ],
@@ -188,7 +199,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ))
                   else
                     ...filteredNotifications.map((n) => NotificationItemCard(
-                      id: n.relatedEventId != null ? 'EV-${n.relatedEventId}' : 'NOT-${n.id}',
+                      id: n.relatedEventId != null
+                          ? _formatEventId(n.relatedEventId!, n.createdAt)
+                          : 'NOT-${n.id}',
                       time: _formatDate(n.createdAt),
                       title: n.title,
                       description: n.body,
@@ -241,8 +254,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Avisos Técnicos de Red', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: colors.textPrimary)),
-                    Text('Monitoreo NOC - Fibra Óptica', style: TextStyle(fontSize: 12, color: colors.textSecondary)),
+                    Text('Notificaciones Técnicos', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: colors.textPrimary)),
                   ],
                 ),
               ),
@@ -303,8 +315,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           _buildFilterChip(context, 'Todas ($total)', 0),
           const SizedBox(width: 8),
           _buildFilterChip(context, 'No leídas ($unread)', 1),
-          const SizedBox(width: 8),
-          _buildFilterChip(context, 'Cortes de Fibra ($cuts)', 2),
         ],
       ),
     );

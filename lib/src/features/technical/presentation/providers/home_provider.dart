@@ -66,6 +66,7 @@ class HomeProvider extends ChangeNotifier {
       String? status;
       if (_selectedFilter == EventFilter.activos) status = 'ACTIVE';
       if (_selectedFilter == EventFilter.atendidos) status = 'RESOLVED';
+      if (_selectedFilter == EventFilter.cerrados) status = 'CLOSED';
 
       _events = await _getEventsUseCase(status: status);
       await _updateLastSyncTime();

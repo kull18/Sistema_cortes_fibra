@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/app_colors.dart';
 import '../../../../core/app_routes.dart';
+import '../../../../core/theme/dark_map_style.dart';
+import '../../../../core/theme/theme_extensions.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/detail_top_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -24,6 +27,8 @@ class FichaCentralScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final authProvider = context.watch<AuthProvider>();
     final homeProvider = context.watch<HomeProvider>();
     final user = authProvider.user;
@@ -37,6 +42,7 @@ class FichaCentralScreen extends StatelessWidget {
       onTabSelected: (_) {},
       showDivider: true,
       padding: EdgeInsets.zero,
+      isScrollable: false,
       appBar: DetailTopBar(
         title: 'Ficha de Central',
         subtitle: '[${office.prefix}] · Nodo ID #${office.id}',
@@ -55,12 +61,12 @@ class FichaCentralScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+                border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: colors.shadow,
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -75,34 +81,34 @@ class FichaCentralScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryBlueSoft,
+                          color: colors.primaryBlueSoft,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           '[${office.prefix}]',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.primaryBlue,
+                            color: colors.primaryBlue,
                           ),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDCFCE7),
+                          color: colors.statusGreen.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.check_circle_outline, size: 14, color: AppColors.statusGreen),
-                            SizedBox(width: 4),
+                            Icon(Icons.check_circle_outline, size: 14, color: colors.statusGreen),
+                            const SizedBox(width: 4),
                             Text(
                               'Activa',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.statusGreen,
+                                color: colors.statusGreen,
                               ),
                             ),
                           ],
@@ -113,10 +119,10 @@ class FichaCentralScreen extends StatelessWidget {
                   const SizedBox(height: 14),
                   Text(
                     office.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -125,15 +131,15 @@ class FichaCentralScreen extends StatelessWidget {
                       SvgPicture.asset(
                         'assets/icons/ic_location.svg',
                         width: 14,
-                        colorFilter: const ColorFilter.mode(AppColors.textSecondary, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(colors.textSecondary, BlendMode.srcIn),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         office.city,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
@@ -148,12 +154,12 @@ class FichaCentralScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+                border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: colors.shadow,
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -162,25 +168,25 @@ class FichaCentralScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'ESPECIFICACIONES DEL NODO',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                       letterSpacing: 1.0,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildSpecRow('Prefijo de Red', office.prefix),
-                  const Divider(height: 20, thickness: 0.5),
-                  _buildSpecRow('ID de Sistema', '#${office.id}'),
-                  const Divider(height: 20, thickness: 0.5),
-                  _buildSpecRow('Ciudad / Municipio', office.city),
-                  const Divider(height: 20, thickness: 0.5),
-                  _buildSpecRow('Coordenadas GPS', '$latFormatted° N, $lngFormatted° W'),
-                  const Divider(height: 20, thickness: 0.5),
-                  _buildSpecRow('Tipo de Instalación', 'Central Troncal Monomodo'),
+                  _buildSpecRow(context, 'Prefijo de Red', office.prefix),
+                  Divider(height: 20, thickness: 0.5, color: colors.borderSubtle),
+                  _buildSpecRow(context, 'ID de Sistema', '#${office.id}'),
+                  Divider(height: 20, thickness: 0.5, color: colors.borderSubtle),
+                  _buildSpecRow(context, 'Ciudad / Municipio', office.city),
+                  Divider(height: 20, thickness: 0.5, color: colors.borderSubtle),
+                  _buildSpecRow(context, 'Coordenadas GPS', '$latFormatted° N, $lngFormatted° W'),
+                  Divider(height: 20, thickness: 0.5, color: colors.borderSubtle),
+                  _buildSpecRow(context, 'Tipo de Instalación', 'Central Troncal Monomodo'),
                 ],
               ),
             ),
@@ -189,21 +195,21 @@ class FichaCentralScreen extends StatelessWidget {
             // Card 3: Mapa Preview
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.borderSubtle.withOpacity(0.2)),
+                border: Border.all(color: colors.borderSubtle.withOpacity(0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                     child: Text(
                       'GEOLOCALIZACIÓN',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         letterSpacing: 1.0,
                       ),
                     ),
@@ -217,6 +223,12 @@ class FichaCentralScreen extends StatelessWidget {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: GoogleMap(
+                      style: isDark ? darkMapStyle : null,
+                      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                        Factory<OneSequenceGestureRecognizer>(
+                          () => EagerGestureRecognizer(),
+                        ),
+                      },
                       initialCameraPosition: CameraPosition(
                         target: pos,
                         zoom: 15,
@@ -261,7 +273,7 @@ class FichaCentralScreen extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryBlue,
+                      backgroundColor: colors.primaryBlue,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -277,24 +289,26 @@ class FichaCentralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecRow(String label, String value) {
+  Widget _buildSpecRow(BuildContext context, String label, String value) {
+    final colors = context.colors;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
       ],

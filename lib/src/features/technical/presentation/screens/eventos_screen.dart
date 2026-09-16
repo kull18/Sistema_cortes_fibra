@@ -90,10 +90,20 @@ class _EventosScreenState extends State<EventosScreen> {
         final filteredEvents = showSkeleton 
             ? _fakeEvents 
             : provider.events.where((event) {
-                final query = _searchController.text.toLowerCase();
+                final query = _searchController.text.toLowerCase().trim();
+                if (query.isEmpty) return true;
+
+                final rawIdStr = event.rawId?.toString() ?? '';
+                final simpleId = 'ev-$rawIdStr';
+
                 return event.id.toLowerCase().contains(query) ||
+                    simpleId.contains(query) ||
+                    rawIdStr == query ||
+                    event.originPrefix.toLowerCase().contains(query) ||
+                    event.destinationPrefix.toLowerCase().contains(query) ||
                     event.description.toLowerCase().contains(query) ||
-                    event.location.toLowerCase().contains(query);
+                    event.location.toLowerCase().contains(query) ||
+                    event.reporterDisplay.toLowerCase().contains(query);
               }).toList();
 
         final activosCount = showSkeleton ? 0 : provider.events.where((e) => e.status == FiberEventStatus.activo).length;

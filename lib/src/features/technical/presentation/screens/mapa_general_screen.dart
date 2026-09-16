@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -96,7 +98,7 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
     final currentSelection = _selectedEvent ?? (activeCuts.isNotEmpty ? activeCuts.first : null);
 
     return AppScaffold(
-      isScrollable: true,
+      isScrollable: false,
       padding: EdgeInsets.zero,
       appBar: DetailTopBar(
         title: 'Mapa General',
@@ -319,6 +321,11 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: GoogleMap(
+          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+            Factory<OneSequenceGestureRecognizer>(
+              () => EagerGestureRecognizer(),
+            ),
+          },
           initialCameraPosition: _initialPosition,
           mapType: _isSatellite ? MapType.satellite : MapType.normal,
           markers: _buildMarkers(home, office),
@@ -388,8 +395,6 @@ class _MapaGeneralScreenState extends State<MapaGeneralScreen> {
                     const Icon(Icons.location_on, size: 14, color: AppColors.primaryBlue),
                     const SizedBox(width: 6),
                     Text('${selectedEvent.originPrefix} → ${selectedEvent.destinationPrefix}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primaryBlue)),
-                    const SizedBox(width: 4),
-                    Text('(${selectedEvent.kmReference})', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),
                 const SizedBox(height: 16),

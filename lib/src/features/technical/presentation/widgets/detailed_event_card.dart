@@ -75,7 +75,7 @@ class DetailedEventCard extends StatelessWidget {
           Divider(height: 1, color: colors.borderSubtle),
           const SizedBox(height: 12),
           Text(
-            event.description,
+            'Descripción: ${event.description.isNotEmpty ? event.description : 'Sin descripción'}',
             style: TextStyle(
               fontSize: 12,
               color: colors.textSecondary,
@@ -102,7 +102,7 @@ class DetailedEventCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    event.timeLabel,
+                    'Fecha: ${event.timeLabel}',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
