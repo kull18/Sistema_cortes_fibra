@@ -11,7 +11,12 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
-val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+val mapsApiKey = (
+    System.getenv("MAPS_API_KEY")
+        ?: localProperties.getProperty("MAPS_API_KEY")
+        ?: ""
+).trim()
+
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
@@ -64,6 +69,14 @@ android {
     kotlin {
         compilerOptions {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    if (allTasks.any { it.name.contains("Release", ignoreCase = true) }) {
+        if (mapsApiKey.isEmpty()) {
+            throw GradleException("CRITICAL: MAPS_API_KEY is missing or empty! Cannot build release APK/AAB without Google Maps API Key. Check GitHub Secrets or android/local.properties.")
         }
     }
 }
