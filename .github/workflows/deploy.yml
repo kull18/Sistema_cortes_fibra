@@ -46,10 +46,20 @@ jobs:
           }
           EOF
 
-      - name: Set Maps API Key
-        run: echo "MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> android/local.properties
+      - name: Configure Maps API Key
+        env:
+          MAPS_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.MAPS_API_KEY }}
+        run: |
+          if [ -z "$MAPS_KEY" ]; then
+            echo "::error::CRITICAL: Neither GOOGLE_MAPS_API_KEY nor MAPS_API_KEY is configured in GitHub Secrets!"
+            exit 1
+          fi
+          echo "MAPS_API_KEY=$MAPS_KEY" >> android/local.properties
+          echo "Maps API Key configured successfully (length: ${#MAPS_KEY})"
 
       - name: Build App Bundle
+        env:
+          MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.MAPS_API_KEY }}
         run: flutter build appbundle --release --dart-define-from-file=env/production.json
 
       - name: Upload to Play Store (Closed Testing)
